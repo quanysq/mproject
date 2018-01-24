@@ -347,11 +347,12 @@
             // 
             // btnSendMsg
             // 
-            this.btnSendMsg.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.btnSendMsg.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSendMsg.Location = new System.Drawing.Point(943, 150);
+            this.btnSendMsg.Location = new System.Drawing.Point(3, 150);
             this.btnSendMsg.Name = "btnSendMsg";
-            this.btnSendMsg.Size = new System.Drawing.Size(75, 31);
+            this.btnSendMsg.Size = new System.Drawing.Size(1015, 31);
             this.btnSendMsg.TabIndex = 0;
             this.btnSendMsg.Text = "发送消息";
             this.btnSendMsg.UseVisualStyleBackColor = true;
