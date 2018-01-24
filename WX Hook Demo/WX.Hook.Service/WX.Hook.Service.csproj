@@ -40,6 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonUtil.cs" />
+    <Compile Include="IWeChatEngine.cs" />
+    <Compile Include="Model\WeDllModel.cs" />
+    <Compile Include="Model\WxInfoModel.cs" />
+    <Compile Include="WeChatEngine..cs" />
+    <Compile Include="WeDll.cs" />
+    <Compile Include="WeDllEnum.cs" />
     <Compile Include="WxService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

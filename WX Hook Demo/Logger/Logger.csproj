@@ -201,7 +201,7 @@
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LogUtil.cs" />
+    <Compile Include="WXLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="log.config">

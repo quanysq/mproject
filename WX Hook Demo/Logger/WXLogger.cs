@@ -3,7 +3,7 @@ using System.IO;
 
 namespace LogHelper
 {
-    public static class LogUtil
+    public static class WXLogger
     {
         public static ILogger DEFAULT       = new Logger("DEFAULT_LOG");
         public static ILogger WXHOOKUI      = new Logger("WXHOOKUI_LOG");

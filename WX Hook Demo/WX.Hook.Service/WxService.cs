@@ -247,7 +247,7 @@ namespace WX.Hook.Service
 
         public static void CloseWechat(InjectResult injectResult)
         {
-            LogHelper.LogUtil.WXHOOKSERVICE.InfoFormat("injectResult.PInfo.hProcess: [{0}], injectResult.AllocMemAddressOfWeDll: [{1}], injectResult.DwSize: [{2}]", injectResult.PInfo.hProcess, injectResult.AllocMemAddressOfWeDll, injectResult.DwSize);
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("injectResult.PInfo.hProcess: [{0}], injectResult.AllocMemAddressOfWeDll: [{1}], injectResult.DwSize: [{2}]", injectResult.PInfo.hProcess, injectResult.AllocMemAddressOfWeDll, injectResult.DwSize);
             VirtualFreeEx(injectResult.PInfo.hProcess, injectResult.AllocMemAddressOfWeDll, injectResult.DwSize, 0x8000);
             //uint i = 0;
             //GetExitCodeProcess(injectResult.PInfo.hProcess, ref i);
@@ -262,12 +262,12 @@ namespace WX.Hook.Service
         {
             int pid = 0;
             var hWnd = FindWindow(null, wechatWindowName);
-            LogHelper.LogUtil.WXHOOKSERVICE.InfoFormat("WechatWindowExsits -> FindWindowEx: [{0}]", hWnd);
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WechatWindowExsits -> FindWindowEx: [{0}]", hWnd);
 
             if (hWnd != IntPtr.Zero)
             {
                 GetWindowThreadProcessId(hWnd, out pid);
-                LogHelper.LogUtil.WXHOOKSERVICE.InfoFormat("WechatWindowExsits -> GetWindowThreadProcessId: [{0}]", pid);
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WechatWindowExsits -> GetWindowThreadProcessId: [{0}]", pid);
 
                 if (pid == processID)
                 {
@@ -348,7 +348,7 @@ namespace WX.Hook.Service
                     throw new Exception("Create the remote thread for WeDll failed！");
                 }
 
-                LogHelper.LogUtil.WXHOOKSERVICE.InfoFormat("Injected WeDll successfully!");
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Injected WeDll successfully!");
 
                 InjectResult injectResult = new InjectResult()
                 {

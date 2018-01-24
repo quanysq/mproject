@@ -60,12 +60,12 @@ namespace WX.Hook.UI
                         string friendOrigID = lvi.SubItems[1].Text;
                         string groupOrigID = CommonUtil.TranNull<string>(lvi.SubItems[1].Tag);
                         string msg = string.Format("{0}|{1}|测试Test", groupOrigID, friendOrigID);
-                        LogHelper.LogUtil.WXHOOKUI.InfoFormat("@Someone message: [{0}]", msg);
+                        LogHelper.WXLogger.WXHOOKUI.InfoFormat("@Someone message: [{0}]", msg);
                         SendWeDllCmd(currentWxInfoEntity, (int)WX_CMD.WX_CMD_TYPE_E_AT_GROUP_MEMBER_MSG, msg);
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.LogUtil.WXHOOKUI.Error("Error occurred when @ sb.: ", ex);
+                        LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when @ sb.: ", ex);
                     }
                 }
             }
@@ -83,12 +83,12 @@ namespace WX.Hook.UI
                         string friendOrigID = lvi.SubItems[1].Text;
                         string groupOrigID = CommonUtil.TranNull<string>(lvi.SubItems[1].Tag);
                         string msg = string.Format("{0}|{1}", groupOrigID, friendOrigID);
-                        LogHelper.LogUtil.WXHOOKUI.InfoFormat("@Someone message: [{0}]", msg);
+                        LogHelper.WXLogger.WXHOOKUI.InfoFormat("@Someone message: [{0}]", msg);
                         SendWeDllCmd(currentWxInfoEntity, (int)WX_CMD.WX_CMD_TYPE_E_AT_GROUP_MEMBER, msg);
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.LogUtil.WXHOOKUI.Error("Error occurred when @ sb.: ", ex);
+                        LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when @ sb.: ", ex);
                     }
                 }
             }
@@ -136,7 +136,7 @@ namespace WX.Hook.UI
                 byte[] data = new byte[1004];
                 EndPoint client = new IPEndPoint(IPAddress.Any, 0);
                 int count = socketClient.ReceiveFrom(data, ref client);
-                LogHelper.LogUtil.WXHOOKUI.InfoFormat("client: [{0}]", client);
+                LogHelper.WXLogger.WXHOOKUI.InfoFormat("client: [{0}]", client);
                 byte[] ret = new byte[count];
                 Array.Copy(data, ret, count);
 
@@ -179,7 +179,7 @@ namespace WX.Hook.UI
 
         private void HandMessagecb(int type, string msg, EndPoint clientOfReceiveFrom)
         {
-            LogHelper.LogUtil.WXHOOKUI.InfoFormat("HandMessagecb ClientOfReceiveFrom: [{2}], type: [{0}], msg: [{1}]", type, msg, clientOfReceiveFrom);
+            LogHelper.WXLogger.WXHOOKUI.InfoFormat("HandMessagecb ClientOfReceiveFrom: [{2}], type: [{0}], msg: [{1}]", type, msg, clientOfReceiveFrom);
 
             ListViewItem lvi = new ListViewItem();
             lvi.Text = "0";
@@ -236,7 +236,7 @@ namespace WX.Hook.UI
                 if (msg.Equals("END", StringComparison.OrdinalIgnoreCase))
                 {
 
-                    LogHelper.LogUtil.WXHOOKUI.InfoFormat("FriendList count: [{0}]", currentWxInfoEntity.FriendList.Count);
+                    LogHelper.WXLogger.WXHOOKUI.InfoFormat("FriendList count: [{0}]", currentWxInfoEntity.FriendList.Count);
                     lsvFriend.Items.Clear();
                     lsvFriend.BeginUpdate();
                     foreach (FriendInfo_Entity friend_Info in currentWxInfoEntity.FriendList)
@@ -272,7 +272,7 @@ namespace WX.Hook.UI
             {
                 if (msg.Equals("END", StringComparison.OrdinalIgnoreCase))
                 {
-                    LogHelper.LogUtil.WXHOOKUI.InfoFormat("GroupList count: [{0}]", currentWxInfoEntity.GroupList.Count);
+                    LogHelper.WXLogger.WXHOOKUI.InfoFormat("GroupList count: [{0}]", currentWxInfoEntity.GroupList.Count);
                     lsvGroup.Items.Clear();
                     lsvGroup.BeginUpdate();
                     foreach (GroupInfo_Entity groupInfo in currentWxInfoEntity.GroupList)
@@ -308,9 +308,9 @@ namespace WX.Hook.UI
                 if (msg.Equals("END", StringComparison.OrdinalIgnoreCase))
                 {
                     List<GroupInfo_Entity> selectedGroupList = currentWxInfoEntity.GroupList.FindAll(x => x.Selected == true);
-                    LogHelper.LogUtil.WXHOOKUI.InfoFormat("GroupList selected count: [{0}]", selectedGroupList.Count);
+                    LogHelper.WXLogger.WXHOOKUI.InfoFormat("GroupList selected count: [{0}]", selectedGroupList.Count);
                     GroupInfo_Entity currentGroup = selectedGroupList[0];
-                    LogHelper.LogUtil.WXHOOKUI.InfoFormat("Group ID: [{0}], member count: [{1}]", currentGroup.Group_Orig_ID, currentGroup.MemberList.Count);
+                    LogHelper.WXLogger.WXHOOKUI.InfoFormat("Group ID: [{0}], member count: [{1}]", currentGroup.Group_Orig_ID, currentGroup.MemberList.Count);
                     lsvGroupMember.Items.Clear();
                     lsvGroupMember.BeginUpdate();
                     foreach (FriendInfo_Entity friend_Info in currentGroup.MemberList)
@@ -322,8 +322,8 @@ namespace WX.Hook.UI
                             Text = friend_Info.Friend_Orig_ID,
                             Tag = friend_Info.Group_Orig_ID
                         };
-                        LogHelper.LogUtil.WXHOOKUI.InfoFormat("lsvs.Tag of friend_Info.Group_Orig_ID: {0}", friend_Info.Group_Orig_ID);
-                        LogHelper.LogUtil.WXHOOKUI.InfoFormat("lsvs.Tag: {0}", lsvs.Tag);
+                        LogHelper.WXLogger.WXHOOKUI.InfoFormat("lsvs.Tag of friend_Info.Group_Orig_ID: {0}", friend_Info.Group_Orig_ID);
+                        LogHelper.WXLogger.WXHOOKUI.InfoFormat("lsvs.Tag: {0}", lsvs.Tag);
                         lviFriend.SubItems.Add(lsvs);
                         lsvGroupMember.Items.Add(lviFriend);
                     }
@@ -396,7 +396,7 @@ namespace WX.Hook.UI
                     }
                     catch (System.Exception ex)
                     {
-                        LogHelper.LogUtil.WXHOOKUI.Warn("ReceiveUdp Warnning: ", ex);
+                        LogHelper.WXLogger.WXHOOKUI.Warn("ReceiveUdp Warnning: ", ex);
                         if (ex.Message == "正在中止线程。")
                         {
                             return;
@@ -435,12 +435,11 @@ namespace WX.Hook.UI
             g_serverEndPort = new IPEndPoint(ip, 24777);
 
             socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            //g_client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             socketClient.DontFragment = true;
             socketClient.ReceiveTimeout = 3000;
             socketClient.Bind(g_serverEndPort);
             
-            /* 开始手发包线程 */
+            /* 开始收发包线程 */
             eventExitThread = new ManualResetEvent(false);
             threadRecv = new MyThread(new ParameterizedThreadStart(ReceiveUdp));
             threadRecv.Start(0);
@@ -470,7 +469,7 @@ namespace WX.Hook.UI
             }
             catch (Exception ex)
             {
-                LogHelper.LogUtil.WXHOOKUI.Error("Error occurred when send message to group.", ex);
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when send message to group.", ex);
             }
         }
 
@@ -478,14 +477,14 @@ namespace WX.Hook.UI
         {
             if (socketClient == null)
             {
-                LogHelper.LogUtil.WXHOOKUI.InfoFormat("Socket is null.");
+                LogHelper.WXLogger.WXHOOKUI.InfoFormat("Socket is null.");
                 return;
             }
                 
 
             if (!socketClient.Connected)
             {
-                LogHelper.LogUtil.WXHOOKUI.InfoFormat("Socket is connected");
+                LogHelper.WXLogger.WXHOOKUI.InfoFormat("Socket is connected");
                 return;
             }
                 
@@ -496,7 +495,7 @@ namespace WX.Hook.UI
             }
             catch(Exception ex)
             {
-                LogHelper.LogUtil.WXHOOKUI.Error("Error occurred when shutdown socket: ", ex);
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when shutdown socket: ", ex);
             }
 
             try
@@ -505,7 +504,7 @@ namespace WX.Hook.UI
             }
             catch(Exception ex)
             {
-                LogHelper.LogUtil.WXHOOKUI.Error("Error occurred when close socket: ", ex);
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when close socket: ", ex);
             }
         }
 
