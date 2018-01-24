@@ -58,7 +58,7 @@ namespace WX.Hook.UI
                     {
                         if (currentWxInfoEntity == null) return;
                         string friendOrigID = lvi.SubItems[1].Text;
-                        string groupOrigID = CommonUtil.TranNull<string>(lvi.SubItems[1].Tag);
+                        string groupOrigID = MyCommonUtil.TranNull<string>(lvi.SubItems[1].Tag);
                         string msg = string.Format("{0}|{1}|测试Test", groupOrigID, friendOrigID);
                         LogHelper.WXLogger.WXHOOKUI.InfoFormat("@Someone message: [{0}]", msg);
                         SendWeDllCmd(currentWxInfoEntity, (int)WX_CMD.WX_CMD_TYPE_E_AT_GROUP_MEMBER_MSG, msg);
@@ -81,7 +81,7 @@ namespace WX.Hook.UI
                     {
                         if (currentWxInfoEntity == null) return;
                         string friendOrigID = lvi.SubItems[1].Text;
-                        string groupOrigID = CommonUtil.TranNull<string>(lvi.SubItems[1].Tag);
+                        string groupOrigID = MyCommonUtil.TranNull<string>(lvi.SubItems[1].Tag);
                         string msg = string.Format("{0}|{1}", groupOrigID, friendOrigID);
                         LogHelper.WXLogger.WXHOOKUI.InfoFormat("@Someone message: [{0}]", msg);
                         SendWeDllCmd(currentWxInfoEntity, (int)WX_CMD.WX_CMD_TYPE_E_AT_GROUP_MEMBER, msg);
@@ -107,7 +107,7 @@ namespace WX.Hook.UI
         {
             foreach (var wxInfo in wxLoggedinList)
             {
-                int pID = CommonUtil.TranNull<int>(wxInfo.WxProcessID);
+                int pID = MyCommonUtil.TranNull<int>(wxInfo.WxProcessID);
                 Process process = Process.GetProcessById(pID);
                 if (process != null) process.Kill();
             }
@@ -251,7 +251,7 @@ namespace WX.Hook.UI
                 else
                 {
                     var friendList = msg.Split('|');
-                    int friendIndex = CommonUtil.TranNull<int>(friendList[0]);
+                    int friendIndex = MyCommonUtil.TranNull<int>(friendList[0]);
                     friendIndex = friendIndex + 1;
                     FriendInfo_Entity friendInfo = new FriendInfo_Entity()
                     {
@@ -287,7 +287,7 @@ namespace WX.Hook.UI
                 else
                 {
                     var groupList = msg.Split('|');
-                    int groupIndex = CommonUtil.TranNull<int>(groupList[0]);
+                    int groupIndex = MyCommonUtil.TranNull<int>(groupList[0]);
                     groupIndex = groupIndex + 1;
                     GroupInfo_Entity groupInfo = new GroupInfo_Entity()
                     {
@@ -332,7 +332,7 @@ namespace WX.Hook.UI
                 else
                 {
                     var groupmemberList = msg.Split('|');
-                    int groupmemberIndex = CommonUtil.TranNull<int>(groupmemberList[0]);
+                    int groupmemberIndex = MyCommonUtil.TranNull<int>(groupmemberList[0]);
                     groupmemberIndex = groupmemberIndex + 1;
                     string groupID = groupmemberList[1];
                     string groupMemberMsg = string.Format("{0}|{1}", groupmemberIndex, groupID);
@@ -515,7 +515,7 @@ namespace WX.Hook.UI
         /// <returns></returns>
         private bool CheckWxOnline(WX_Info_Entity wx)
         {
-            int pID = CommonUtil.TranNull<int>(wx.WxProcessID);
+            int pID = MyCommonUtil.TranNull<int>(wx.WxProcessID);
             Process p = Process.GetProcessById(pID);
             if (p == null)
             {

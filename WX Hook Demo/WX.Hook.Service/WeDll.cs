@@ -15,7 +15,7 @@ namespace WX.Hook.Service
     /// <summary>
     /// 封装第三方的Hook DLL
     /// </summary>
-    public sealed class WeDll
+    internal sealed class WeDll
     {
         #region Win32 API Const
         // privileges
@@ -306,28 +306,31 @@ namespace WX.Hook.Service
                 {
                     try
                     {
+                        bool SocketCanRead = socket.Poll(100, SelectMode.SelectRead);
+                        LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Socket can read? [{0}]", SocketCanRead);
+                        if (!SocketCanRead) continue;
+
                         byte[] data = new byte[1004];
                         EndPoint remoteAddr = new IPEndPoint(IPAddress.Any, 0);
                         int count = socket.ReceiveFrom(data, ref remoteAddr);
-                        LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Remote Address: [{0}]", remoteAddr);
-                        byte[] ret = new byte[count];
-                        Array.Copy(data, ret, count);
- 
-                        if (data != null && data.Length > 0)
-                        {
-                            byte[] b1 = new byte[4];
-                            byte[] b2 = new byte[1001];
+                        LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Remote Address: [{0}], Receive Data Size: [{1}]", remoteAddr, count);
+                        if (count == 0) continue;
 
-                            Array.Copy(data, b1, 4);
-                            Array.Copy(data, 4, b2, 0, 1000);
+                        //byte[] ret = new byte[count];
+                        //Array.Copy(data, ret, count);
 
-                            int type = BitConverter.ToInt32(b1, 0);
-                            string content = Encoding.UTF8.GetString(b2);
-                            int _index = content.IndexOf("\0");
-                            content = content.Substring(0, _index);
+                        byte[] b1 = new byte[4];
+                        byte[] b2 = new byte[1001];
 
-                            handleMessage(type, content, remoteAddr);
-                        }
+                        Array.Copy(data, b1, 4);
+                        Array.Copy(data, 4, b2, 0, 1000);
+
+                        int type = BitConverter.ToInt32(b1, 0);
+                        string content = Encoding.UTF8.GetString(b2);
+                        int _index = content.IndexOf("\0");
+                        content = content.Substring(0, _index);
+
+                        handleMessage(type, content, remoteAddr);
                     }
                     catch (Exception ex)
                     {
@@ -339,6 +342,17 @@ namespace WX.Hook.Service
         }
 
         #region Methods for WeDLL CMD 
+        /// <summary>
+        /// 接收微信消息
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="wx"></param>
+        /// <param name="msg"></param>
+        public static void ReceiveWxMessage(Socket socket, WxInfoModel wx)
+        {
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_MSG_READ, "");
+        }
+
         /// <summary>
         /// 获取微信好友列表
         /// </summary>
@@ -393,12 +407,12 @@ namespace WX.Hook.Service
         /// </summary>
         /// <param name="socket"></param>
         /// <param name="wx"></param>
-        /// <param name="friendOrigID"></param>
+        /// <param name="memberOrigID"></param>
         /// <param name="groupOrigID"></param>
         /// <param name="msgContent"></param>
-        public static void SendGroupMessageEx(Socket socket, WxInfoModel wx, string friendOrigID, string groupOrigID, string msgContent)
+        public static void SendGroupMessageEx(Socket socket, WxInfoModel wx, string memberOrigID, string groupOrigID, string msgContent)
         {
-            string msg = string.Format("{0}|{1}|测试Test", groupOrigID, friendOrigID, msgContent);
+            string msg = string.Format("{0}|{1}|{2}", groupOrigID, memberOrigID, msgContent);
             LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("@Someone message: [{0}]", msg);
             SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_AT_GROUP_MEMBER_MSG, msg);
         }

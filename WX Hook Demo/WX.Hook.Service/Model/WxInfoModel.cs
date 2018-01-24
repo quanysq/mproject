@@ -61,7 +61,5 @@ namespace WX.Hook.Service.Model
             get { return m_memberList; }
             set { m_memberList = value; }
         }
-
-        public bool Selected { get; set; }
     }
 }

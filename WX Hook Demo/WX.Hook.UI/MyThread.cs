@@ -198,7 +198,7 @@ namespace WX.Hook.UI
         object threadState;
     }
 
-    public static class CommonUtil
+    public static class MyCommonUtil
     {
         public static T TranNull<T>(object obj)
         {

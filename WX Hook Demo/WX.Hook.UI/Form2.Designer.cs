@@ -52,8 +52,6 @@
             this.tlpRight = new System.Windows.Forms.TableLayoutPanel();
             this.gbReciveData = new System.Windows.Forms.GroupBox();
             this.lsvReciveData = new System.Windows.Forms.ListView();
-            this.ch_id = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ch_type = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_content = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tlpSendMsg = new System.Windows.Forms.TableLayoutPanel();
             this.btnSendMsg = new System.Windows.Forms.Button();
@@ -306,8 +304,6 @@
             // lsvReciveData
             // 
             this.lsvReciveData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.ch_id,
-            this.ch_type,
             this.ch_content});
             this.lsvReciveData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lsvReciveData.Location = new System.Drawing.Point(3, 16);
@@ -317,18 +313,10 @@
             this.lsvReciveData.UseCompatibleStateImageBehavior = false;
             this.lsvReciveData.View = System.Windows.Forms.View.Details;
             // 
-            // ch_id
-            // 
-            this.ch_id.Text = "id";
-            // 
-            // ch_type
-            // 
-            this.ch_type.Text = "type";
-            // 
             // ch_content
             // 
-            this.ch_content.Text = "content";
-            this.ch_content.Width = 1100;
+            this.ch_content.Text = "消息内容";
+            this.ch_content.Width = 1000;
             // 
             // tlpSendMsg
             // 
@@ -417,8 +405,6 @@
         private System.Windows.Forms.TableLayoutPanel tlpRight;
         private System.Windows.Forms.GroupBox gbReciveData;
         private System.Windows.Forms.ListView lsvReciveData;
-        private System.Windows.Forms.ColumnHeader ch_id;
-        private System.Windows.Forms.ColumnHeader ch_type;
         private System.Windows.Forms.ColumnHeader ch_content;
         private System.Windows.Forms.TableLayoutPanel tlpSendMsg;
         private System.Windows.Forms.Button btnSendMsg;
