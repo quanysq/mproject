@@ -85,16 +85,20 @@ namespace WX.Hook.Service
 
         public void GetWXFriendList(string msg = "0")
         {
+            if (SelectedWx == null) return;
             WeDll.GetWXFriendList(_SocketClient, SelectedWx, msg);
         }
 
         public void GetWXGroupList(string msg = "0")
         {
+            if (SelectedWx == null) return;
             WeDll.GetWXGroupList(_SocketClient, SelectedWx, msg);
         }
 
         public void GetWXGroupMemberList(string memberPosition = "0")
         {
+            if (SelectedWx == null) return;
+            if (SelectedGroup == null) return;
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             WeDll.GetWXGroupMemberList(_SocketClient, SelectedWx, groupOrigID, memberPosition);
         }
@@ -106,11 +110,18 @@ namespace WX.Hook.Service
             return pID;
         }
 
-        public void ReceiveDataFromWeDll(Action<WeDllCmd, object> callback)
+        public void ReceiveWxMessage()
+        {
+            if (SelectedWx == null) return;
+            WeDll.ReceiveWxMessage(_SocketClient, SelectedWx);
+        }
+
+        public void ReceiveDataFromWeDll(Action<CallBackType, object> callback)
         {
             WeDll.ReceiveDataFromWeDllUsingUdp(_SocketClient, (type, msg, receiveAddr) => 
             {
-                LogHelper.WXLogger.WXHOOKUI.InfoFormat("ReceiveDataFromWeDllUsingUdp receiveAddr: [{2}], type: [{0}], msg: [{1}]", type, msg, receiveAddr);
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO_ACK type is [{0}]", (int)WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO_ACK);
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("ReceiveDataFromWeDllUsingUdp receiveAddr: [{2}], type: [{0}], msg: [{1}]", type, msg, receiveAddr);
 
                 //微信登录
                 if (type == (int)WeDllCmd.WX_CMD_TYPE_D_ONLINE)
@@ -127,27 +138,25 @@ namespace WX.Hook.Service
                 //好友列表
                 if (type == (int)WeDllCmd.WX_CMD_TYPE_E_GET_WX_FRIEND_INFO_ACK)
                 {
-
+                    HandleWeDllMsgForFriendList(msg, callback);
                 }
 
                 //群列表
                 if (type == (int)WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_INFO_ACK)
                 {
-
+                    HandleWeDllMsgForGroupList(msg, callback);
                 }
 
-                //群好友
+                //群好友 
                 if (type == (int)WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO_ACK)
                 {
-
+                    HandleWeDllMsgForGroupMemberList(msg, callback);
                 }
             });
         }
 
         #region Handle WeDll Message
-
-        #region WX Login
-        private void HandleWeDllMsgForLogin(string msg, EndPoint receiveAddr, Action<WeDllCmd, object> callback)
+        private void HandleWeDllMsgForLogin(string msg, EndPoint receiveAddr, Action<CallBackType, object> callback)
         {
             string[] wxInfoFromMsg = msg.Split('|');
             WxInfoModel wxInfo = new WxInfoModel()
@@ -159,36 +168,111 @@ namespace WX.Hook.Service
                 LoginTime   = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 Addr        = receiveAddr
             };
-            if (_WxLoggedinList.Count == 0)
-            {
-                SelectedWx = wxInfo;
-            }
             _WxLoggedinList.Add(wxInfo);
-            callback(WeDllCmd.WX_CMD_TYPE_D_ONLINE, wxInfo);
-            WeDll.ReceiveWxMessage(_SocketClient, SelectedWx);
+            callback(CallBackType.LoginSuccess, wxInfo);
         }
 
-        private void HandleWeDllMsgForReceiveMsg(string msg, Action<WeDllCmd, object> callback)
+        private void HandleWeDllMsgForReceiveMsg(string msg, Action<CallBackType, object> callback)
         {
             if (!msg.Equals("END", StringComparison.OrdinalIgnoreCase))
             {
-                callback(WeDllCmd.WX_CMD_TYPE_E_MSG_READ, msg);
+                callback(CallBackType.ReceiveMsg, msg);
             }
-            Thread.Sleep(1000);
-            WeDll.ReceiveWxMessage(_SocketClient, SelectedWx);
+            if (SelectedWx == null) return;
+            ReceiveWxMessage();
         }
-        #endregion
 
+        private void HandleWeDllMsgForFriendList(string msg, Action<CallBackType, object> callback)
+        {
+            if (msg.Equals("END", StringComparison.OrdinalIgnoreCase))
+            {
+                callback(CallBackType.Friends, null);
+            }
+            else
+            {
+                var friendList = msg.Split('|');
+                int friendIndex = CommonUtil.GetObjTranNull<int>(friendList[0]);
+                friendIndex = friendIndex + 1;
+                FriendInfoModel friendInfo = new FriendInfoModel()
+                {
+                    Friend_Orig_ID = friendList[1],
+                    Friend_ID      = friendList[2],
+                    V_ID           = friendList[3],
+                    Nick           = friendList[4],
+                    Remark         = friendList[5],
+                    Sex            = friendList[6]
+                };
+                SelectedWx.FriendList.Add(friendInfo);
+                GetWXFriendList(friendIndex.ToString());
+            }
+        }
+
+        private void HandleWeDllMsgForGroupList(string msg, Action<CallBackType, object> callback)
+        {
+            if (msg.Equals("END", StringComparison.OrdinalIgnoreCase))
+            {
+                callback(CallBackType.Groups, null);
+            }
+            else
+            {
+                var groupList  = msg.Split('|');
+                int groupIndex = CommonUtil.GetObjTranNull<int>(groupList[0]);
+                groupIndex     = groupIndex + 1;
+                GroupInfoModel groupInfo = new GroupInfoModel()
+                {
+                    Group_Orig_ID = groupList[1],
+                    Group_ID      = groupList[2],
+                    V_ID          = groupList[3],
+                    Nick          = groupList[4],
+                    MemberNumber  = groupList[5]
+                };
+                SelectedWx.GroupList.Add(groupInfo);
+                GetWXGroupList(groupIndex.ToString());
+            }
+        }
+
+        private void HandleWeDllMsgForGroupMemberList(string msg, Action<CallBackType, object> callback)
+        {
+            if (msg.Equals("END", StringComparison.OrdinalIgnoreCase))
+            {
+                callback(CallBackType.GroupMembers, null);
+            }
+            else
+            {
+                var groupmemberList   = msg.Split('|');
+                int groupmemberIndex  = CommonUtil.GetObjTranNull<int>(groupmemberList[0]);
+                groupmemberIndex      = groupmemberIndex + 1;
+                string groupID        = groupmemberList[1];
+                string groupMemberMsg = string.Format("{0}|{1}", groupmemberIndex, groupID);
+                var friendInfo        = new FriendInfoModel()
+                {
+                    Group_Orig_ID  = groupID,
+                    Friend_Orig_ID = groupmemberList[2],
+                    Friend_ID      = groupmemberList[2],
+                    V_ID           = groupmemberList[4],
+                    Nick           = groupmemberList[5],
+                    Remark         = groupmemberList[6],
+                    Sex            = groupmemberList[7]
+                };
+                SelectedGroup.MemberList.Add(friendInfo);
+                GetWXGroupMemberList(groupMemberMsg);
+            }
+        }
         #endregion
 
         public void SendGroupMessage(string msgContent, string msgType = "0")
         {
+            if (SelectedWx == null) return;
+            if (SelectedGroup == null) return;
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             WeDll.SendGroupMessage(_SocketClient, SelectedWx, groupOrigID, msgContent, msgType);
         }
 
         public void SendGroupMessageEx(string msgContent)
         {
+            if (SelectedWx == null) return;
+            if (SelectedGroup == null) return;
+            if (SelectedMemberOfGroup == null) return;
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             string memberOrigID = SelectedMemberOfGroup.Friend_Orig_ID;
             WeDll.SendGroupMessageEx(_SocketClient, SelectedWx, memberOrigID, groupOrigID, msgContent);

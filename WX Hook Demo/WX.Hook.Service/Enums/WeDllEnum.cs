@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WX.Hook.Service
 {
-    public enum WeDllCmd
+    internal enum WeDllCmd
     {
         WX_CMD_TYPE_E_SEND_MSG,								/* 发送消息，消息格式：原始id|内容|类型（0位文字，1位图片）。必须有发送按钮*/
         WX_CMD_TYPE_E_SEND_MSG_ACK,

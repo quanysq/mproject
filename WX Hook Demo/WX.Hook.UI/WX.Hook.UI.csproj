@@ -103,11 +103,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(SolutionDir)Lib\WeDll.dll" "$(TargetDir)" /y /i /e /d
-xcopy "$(SolutionDir)Lib\config.data" "$(TargetDir)" /y /i /e /d
-xcopy "$(SolutionDir)Lib\msvcp120.dll" "$(TargetDir)" /y /i /e /d
-
-xcopy "$(SolutionDir)Lib\msvcr120.dll" "$(TargetDir)" /y /i /e /d
-
-xcopy "$(SolutionDir)Lib\vccorlib120.dll" "$(TargetDir)" /y /i /e /d</PostBuildEvent>
+xcopy "$(SolutionDir)Lib\config.data" "$(TargetDir)" /y /i /e /d</PostBuildEvent>
   </PropertyGroup>
 </Project>

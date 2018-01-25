@@ -57,7 +57,12 @@ namespace WX.Hook.Service
         /// 接收微信消息
         /// </summary>
         /// <param name="callback"></param>
-        void ReceiveDataFromWeDll(Action<WeDllCmd, object> callback);
+        void ReceiveDataFromWeDll(Action<CallBackType, object> callback);
+
+        /// <summary>
+        /// 读取微信消息
+        /// </summary>
+        void ReceiveWxMessage();
 
         /// <summary>
         /// 通过线程检查微信闪退

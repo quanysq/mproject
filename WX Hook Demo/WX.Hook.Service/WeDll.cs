@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WX.Hook.Service.Model;
 
@@ -279,6 +280,11 @@ namespace WX.Hook.Service
             {
                 try
                 {
+                    if (dllCmd == WeDllCmd.WX_CMD_TYPE_E_MSG_READ)
+                    {
+                        Thread.Sleep(2000);
+                    }
+
                     byte[] buff = new byte[1004];
 
                     int type = (int)dllCmd;
@@ -372,7 +378,7 @@ namespace WX.Hook.Service
         /// <param name="msg">消息格式：0，1，2这样的数字，获取的是第几个群。默认从0开始获取</param>
         public static void GetWXGroupList(Socket socket, WxInfoModel wx, string msg = "0")
         {
-            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_INFO, "0");
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_INFO, msg);
         }
 
         /// <summary>
@@ -384,7 +390,8 @@ namespace WX.Hook.Service
         /// <param name="memberPosition">0，1，2这样的数字，获取的是第几个成员。默认从0开始获取</param>
         public static void GetWXGroupMemberList(Socket socket, WxInfoModel wx, string groupOrigID, string memberPosition = "0")
         {
-            string groupMemberMsg = string.Format("{0}|{1}", groupOrigID, memberPosition);
+            string groupMemberMsg = string.Format("{0}|{1}", memberPosition, groupOrigID);
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeDll GetWXGroupMemberList Msg: [{0}]", groupMemberMsg);
             SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO, groupMemberMsg);
         }
 
@@ -399,6 +406,7 @@ namespace WX.Hook.Service
         public static void SendGroupMessage(Socket socket, WxInfoModel wx, string groupOrigID, string msgContent, string msgType = "0")
         {
             string msg = string.Format("{0}|{1}|{2}", groupOrigID, msgContent, msgType);
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeDll SendGroupMessage Msg: [{0}]", msg);
             SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_SEND_MSG_2, msg);
         }
 
@@ -413,7 +421,7 @@ namespace WX.Hook.Service
         public static void SendGroupMessageEx(Socket socket, WxInfoModel wx, string memberOrigID, string groupOrigID, string msgContent)
         {
             string msg = string.Format("{0}|{1}|{2}", groupOrigID, memberOrigID, msgContent);
-            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("@Someone message: [{0}]", msg);
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeDll SendGroupMessageEx Msg: [{0}]", msg);
             SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_AT_GROUP_MEMBER_MSG, msg);
         }
         #endregion
