@@ -47,7 +47,6 @@
     <Compile Include="WeChatEngine..cs" />
     <Compile Include="WeDll.cs" />
     <Compile Include="Enums\WeDllEnum.cs" />
-    <Compile Include="WxService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

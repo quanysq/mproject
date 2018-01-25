@@ -17,9 +17,9 @@ using WX.Hook.Service.Model;
 
 namespace WX.Hook.UI
 {
-    public partial class Form2 : Form
+    public partial class frmDemo : Form
     {
-        public Form2()
+        public frmDemo()
         {
             InitializeComponent();
 

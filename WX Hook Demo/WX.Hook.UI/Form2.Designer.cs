@@ -1,6 +1,6 @@
 ﻿namespace WX.Hook.UI
 {
-    partial class Form2
+    partial class frmDemo
     {
         /// <summary>
         /// Required designer variable.
@@ -31,8 +31,8 @@
             this.tlpWhole = new System.Windows.Forms.TableLayoutPanel();
             this.btnOpenWeChat = new System.Windows.Forms.Button();
             this.tlpUnder = new System.Windows.Forms.TableLayoutPanel();
-            this.gbWxLoggedin = new System.Windows.Forms.GroupBox();
             this.tlpLeft = new System.Windows.Forms.TableLayoutPanel();
+            this.gbWxLoggedin = new System.Windows.Forms.GroupBox();
             this.lsvWxLoggedin = new System.Windows.Forms.ListView();
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -58,8 +58,8 @@
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.tlpWhole.SuspendLayout();
             this.tlpUnder.SuspendLayout();
-            this.gbWxLoggedin.SuspendLayout();
             this.tlpLeft.SuspendLayout();
+            this.gbWxLoggedin.SuspendLayout();
             this.gbFriendList.SuspendLayout();
             this.gbGroupList.SuspendLayout();
             this.gbGroupMemberList.SuspendLayout();
@@ -109,17 +109,6 @@
             this.tlpUnder.Size = new System.Drawing.Size(1475, 765);
             this.tlpUnder.TabIndex = 1;
             // 
-            // gbWxLoggedin
-            // 
-            this.gbWxLoggedin.Controls.Add(this.lsvWxLoggedin);
-            this.gbWxLoggedin.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbWxLoggedin.Location = new System.Drawing.Point(3, 3);
-            this.gbWxLoggedin.Name = "gbWxLoggedin";
-            this.gbWxLoggedin.Size = new System.Drawing.Size(430, 183);
-            this.gbWxLoggedin.TabIndex = 0;
-            this.gbWxLoggedin.TabStop = false;
-            this.gbWxLoggedin.Text = "已登录微信";
-            // 
             // tlpLeft
             // 
             this.tlpLeft.ColumnCount = 1;
@@ -139,6 +128,17 @@
             this.tlpLeft.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tlpLeft.Size = new System.Drawing.Size(436, 759);
             this.tlpLeft.TabIndex = 1;
+            // 
+            // gbWxLoggedin
+            // 
+            this.gbWxLoggedin.Controls.Add(this.lsvWxLoggedin);
+            this.gbWxLoggedin.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbWxLoggedin.Location = new System.Drawing.Point(3, 3);
+            this.gbWxLoggedin.Name = "gbWxLoggedin";
+            this.gbWxLoggedin.Size = new System.Drawing.Size(430, 183);
+            this.gbWxLoggedin.TabIndex = 0;
+            this.gbWxLoggedin.TabStop = false;
+            this.gbWxLoggedin.Text = "已登录微信";
             // 
             // lsvWxLoggedin
             // 
@@ -356,18 +356,18 @@
             this.txtMessage.Size = new System.Drawing.Size(1015, 141);
             this.txtMessage.TabIndex = 1;
             // 
-            // Form2
+            // frmDemo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1481, 821);
             this.Controls.Add(this.tlpWhole);
-            this.Name = "Form2";
+            this.Name = "frmDemo";
             this.Text = "WX Hook Demo";
             this.tlpWhole.ResumeLayout(false);
             this.tlpUnder.ResumeLayout(false);
-            this.gbWxLoggedin.ResumeLayout(false);
             this.tlpLeft.ResumeLayout(false);
+            this.gbWxLoggedin.ResumeLayout(false);
             this.gbFriendList.ResumeLayout(false);
             this.gbGroupList.ResumeLayout(false);
             this.gbGroupMemberList.ResumeLayout(false);
