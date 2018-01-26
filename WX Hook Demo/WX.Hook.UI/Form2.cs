@@ -45,14 +45,25 @@ namespace WX.Hook.UI
         {
             try
             {
-                int pID = WeChatEngine.Instance.OpenWeChatAndInjectWeDll();
+                int pID = 0;
+                pID = WeChatEngine.Instance.OpenWeChatAndInjectWeDll();
                 if (pID > 0)
                 {
+                    //启动一个线程检测微信进程是否已经退出
                     WeChatEngine.Instance.CheckWxExistsLoop(pID, (wxPID) =>
                     {
                         SafeInvoke(() =>
                         {
                             lbError.Text = string.Format("微信进程 {0} 已经退出", wxPID);
+                        });
+                    });
+
+                    //启动一个线程检测网络是否连接
+                    WeChatEngine.Instance.CheckWxOfflineLoop(() => 
+                    {
+                        SafeInvoke(() =>
+                        {
+                            lbError.Text = "网络连接已经中断";
                         });
                     });
                 }

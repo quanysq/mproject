@@ -130,7 +130,7 @@ namespace WX.Hook.Service
         {
             bool resultCheck = CheckWxOffline();
             LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("OpenWeChatAndInjectWeDll CheckWxOffline: [{0}]", resultCheck);
-            if (resultCheck)
+            if (!resultCheck)
             {
                 throw new Exception("Network connection failed, please try again later!");
             }
@@ -344,18 +344,13 @@ namespace WX.Hook.Service
 
         public bool CheckWxOffline()
         {
+            Ping ping = null;
             try
             {
-                Ping objPingSender = new Ping();
-                PingOptions objPinOptions = new PingOptions();
-                objPinOptions.DontFragment = true;
-                string data = "";
-                byte[] buffer = Encoding.UTF8.GetBytes(data);
-                int intTimeout = 120;
-                PingReply objPinReply = objPingSender.Send("www.baidu.com", intTimeout, buffer, objPinOptions);
-                string strInfo = objPinReply.Status.ToString();
-                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("CheckWxOffline result: [{0}]", strInfo);
-                if (strInfo.Equals("Success", StringComparison.OrdinalIgnoreCase))
+                ping = new Ping();
+                PingReply pingReply = ping.Send("www.baidu.com");
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("CheckWxOffline result: [{0}]", pingReply.Status);
+                if (pingReply.Status == IPStatus.Success)
                 {
                     return true;
                 }
@@ -368,6 +363,10 @@ namespace WX.Hook.Service
             {
                 LogHelper.WXLogger.WXHOOKUI.Error("CheckWxOffline Error: ", ex);
                 return false;
+            }
+            finally
+            {
+                if (ping != null) ping.Dispose();
             }
         }
 
