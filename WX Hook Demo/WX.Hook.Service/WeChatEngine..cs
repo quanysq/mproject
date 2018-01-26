@@ -83,9 +83,9 @@ namespace WX.Hook.Service
             }
         }
 
-        private bool NetCheck(WxInfoModel wx)
+        private bool CheckNetwork(WxInfoModel wx)
         {
-            int pID = CommonUtil.GetObjTranNull<int>(SelectedWx.WxProcessID);
+            int pID           = CommonUtil.GetObjTranNull<int>(SelectedWx.WxProcessID);
             bool resultCheck1 = CheckWxExists(pID);
             LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("NetCheck CheckWxExists: [{0}]", resultCheck1);
             if (resultCheck1)
@@ -102,26 +102,54 @@ namespace WX.Hook.Service
 
         public void GetWXFriendList(string msg = "0")
         {
-            if (SelectedWx == null) return;
-            bool resultCheck = NetCheck(SelectedWx);
-            if (!resultCheck) return;
+            if (SelectedWx == null)
+            {
+                throw new Exception("Does not select wx!");
+            }
+
+            bool resultCheck = CheckNetwork(SelectedWx);
+            if (!resultCheck)
+            {
+                throw new Exception("Network connection failed or process does not exist!");
+            }
+
             WeDll.GetWXFriendList(_SocketClient, SelectedWx, msg);
         }
 
         public void GetWXGroupList(string msg = "0")
         {
-            if (SelectedWx == null) return;
-            bool resultCheck = NetCheck(SelectedWx);
-            if (!resultCheck) return;
+            if (SelectedWx == null)
+            {
+                throw new Exception("Does not select wx!");
+            }
+
+            bool resultCheck = CheckNetwork(SelectedWx);
+            if (!resultCheck)
+            {
+                throw new Exception("Network connection failed or process does not exist!");
+            }
+
             WeDll.GetWXGroupList(_SocketClient, SelectedWx, msg);
         }
 
         public void GetWXGroupMemberList(string memberPosition = "0")
         {
-            if (SelectedWx == null) return;
-            bool resultCheck = NetCheck(SelectedWx);
-            if (!resultCheck) return;
-            if (SelectedGroup == null) return;
+            if (SelectedWx == null)
+            {
+                throw new Exception("Does not select wx!");
+            }
+
+            bool resultCheck = CheckNetwork(SelectedWx);
+            if (!resultCheck)
+            {
+                throw new Exception("Network connection failed or process does not exist!");
+            }
+
+            if (SelectedGroup == null)
+            {
+                throw new Exception("Does not select group!");
+            }
+
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             WeDll.GetWXGroupMemberList(_SocketClient, SelectedWx, groupOrigID, memberPosition);
         }
@@ -143,7 +171,7 @@ namespace WX.Hook.Service
         public void ReceiveWxMessage()
         {
             if (SelectedWx == null) return;
-            bool resultCheck = NetCheck(SelectedWx);
+            bool resultCheck = CheckNetwork(SelectedWx);
             if (!resultCheck) return;
             WeDll.ReceiveWxMessage(_SocketClient, SelectedWx);
         }
@@ -210,7 +238,7 @@ namespace WX.Hook.Service
             {
                 callback(CallBackType.ReceiveMsg, msg);
             }
-            if (SelectedWx == null) return;
+
             ReceiveWxMessage();
         }
 
@@ -294,17 +322,49 @@ namespace WX.Hook.Service
 
         public void SendGroupMessage(string msgContent, string msgType = "0")
         {
-            if (SelectedWx == null) return;
-            if (SelectedGroup == null) return;
+            if (SelectedWx == null)
+            {
+                throw new Exception("Does not select wx!");
+            }
+
+            bool resultCheck = CheckNetwork(SelectedWx);
+            if (!resultCheck)
+            {
+                throw new Exception("Network connection failed or process does not exist!");
+            }
+
+            if (SelectedGroup == null)
+            {
+                throw new Exception("Does not select group!");
+            }
+
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             WeDll.SendGroupMessage(_SocketClient, SelectedWx, groupOrigID, msgContent, msgType);
         }
 
         public void SendGroupMessageEx(string msgContent)
         {
-            if (SelectedWx == null) return;
-            if (SelectedGroup == null) return;
-            if (SelectedMemberOfGroup == null) return;
+            if (SelectedWx == null)
+            {
+                throw new Exception("Does not select wx!");
+            }
+
+            bool resultCheck = CheckNetwork(SelectedWx);
+            if (!resultCheck)
+            {
+                throw new Exception("Network connection failed or process does not exist!");
+            }
+
+            if (SelectedGroup == null)
+            {
+                throw new Exception("Does not select group!");
+            }
+
+            if (SelectedMemberOfGroup == null)
+            {
+                throw new Exception("Does not select group's member!");
+            }
+
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             string memberOrigID = SelectedMemberOfGroup.Friend_Orig_ID;
             WeDll.SendGroupMessageEx(_SocketClient, SelectedWx, memberOrigID, groupOrigID, msgContent);

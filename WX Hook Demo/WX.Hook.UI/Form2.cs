@@ -76,91 +76,131 @@ namespace WX.Hook.UI
         
         private void LsvWxLoggedin_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            WeChatEngine.Instance.SelectedWx = null;
-            if (e.Item.Checked)
+            try
             {
-                LogHelper.WXLogger.WXHOOKUI.InfoFormat("Selected WX.");
+                WeChatEngine.Instance.SelectedWx = null;
+                if (e.Item.Checked)
+                {
+                    LogHelper.WXLogger.WXHOOKUI.InfoFormat("Selected WX.");
 
-                ResetListViewCheckedStatus(this.lsvWxLoggedin, e.Item.Index);
-                
-                WeChatEngine.Instance.SelectedWx = (WxInfoModel)e.Item.Tag;
-                WeChatEngine.Instance.SelectedWx.FriendList.Clear();
-                WeChatEngine.Instance.SelectedWx.GroupList.Clear();
+                    ResetListViewCheckedStatus(this.lsvWxLoggedin, e.Item.Index);
 
-                this.lsvGroupMember.Items.Clear();
-                WeChatEngine.Instance.GetWXFriendList("0");
-                WeChatEngine.Instance.GetWXGroupList("0");
-                WeChatEngine.Instance.ReceiveWxMessage();
+                    WeChatEngine.Instance.SelectedWx = (WxInfoModel)e.Item.Tag;
+                    WeChatEngine.Instance.SelectedWx.FriendList.Clear();
+                    WeChatEngine.Instance.SelectedWx.GroupList.Clear();
+
+                    this.lsvGroupMember.Items.Clear();
+                    WeChatEngine.Instance.GetWXFriendList("0");
+                    WeChatEngine.Instance.GetWXGroupList("0");
+                    WeChatEngine.Instance.ReceiveWxMessage();
+                }
+                else
+                {
+                    LogHelper.WXLogger.WXHOOKUI.InfoFormat("Unselected WX.");
+
+                    WeChatEngine.Instance.SelectedFriend = null;
+                    WeChatEngine.Instance.SelectedGroup = null;
+                    WeChatEngine.Instance.SelectedMemberOfGroup = null;
+                    this.lsvFriendList.Items.Clear();
+                    this.lsvGroupList.Items.Clear();
+                    this.lsvGroupMember.Items.Clear();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                LogHelper.WXLogger.WXHOOKUI.InfoFormat("Unselected WX.");
-
-                WeChatEngine.Instance.SelectedFriend = null;
-                WeChatEngine.Instance.SelectedGroup = null;
-                WeChatEngine.Instance.SelectedMemberOfGroup = null;
-                this.lsvFriendList.Items.Clear();
-                this.lsvGroupList.Items.Clear();
-                this.lsvGroupMember.Items.Clear();
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when execute LsvWxLoggedin_ItemChecked event: ", ex);
+                MessageBox.Show(ex.Message);
             }
         }
         
         private void LsvFriendList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            WeChatEngine.Instance.SelectedFriend = null;
-            if (e.Item.Checked)
+            try
             {
-                ResetListViewCheckedStatus(this.lsvFriendList, e.Item.Index);
-                WeChatEngine.Instance.SelectedFriend = (FriendInfoModel)e.Item.Tag;
+                WeChatEngine.Instance.SelectedFriend = null;
+                if (e.Item.Checked)
+                {
+                    ResetListViewCheckedStatus(this.lsvFriendList, e.Item.Index);
+                    WeChatEngine.Instance.SelectedFriend = (FriendInfoModel)e.Item.Tag;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when execute LsvFriendList_ItemChecked event: ", ex);
+                MessageBox.Show(ex.Message);
             }
         }
         
         private void LsvGroupList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            WeChatEngine.Instance.SelectedGroup = null;
-            if (e.Item.Checked)
+            try
             {
-                ResetListViewCheckedStatus(this.lsvGroupList, e.Item.Index);
-                WeChatEngine.Instance.SelectedGroup = (GroupInfoModel)e.Item.Tag;
-                WeChatEngine.Instance.SelectedGroup.MemberList.Clear();
+                WeChatEngine.Instance.SelectedGroup = null;
+                if (e.Item.Checked)
+                {
+                    ResetListViewCheckedStatus(this.lsvGroupList, e.Item.Index);
+                    WeChatEngine.Instance.SelectedGroup = (GroupInfoModel)e.Item.Tag;
+                    WeChatEngine.Instance.SelectedGroup.MemberList.Clear();
 
-                WeChatEngine.Instance.GetWXGroupMemberList("0");
-            }
-            else
+                    WeChatEngine.Instance.GetWXGroupMemberList("0");
+                }
+                else
+                {
+                    WeChatEngine.Instance.SelectedMemberOfGroup = null;
+                    this.lsvGroupMember.Items.Clear();
+                }
+            } 
+            catch (Exception ex)
             {
-                WeChatEngine.Instance.SelectedMemberOfGroup = null;
-                this.lsvGroupMember.Items.Clear();
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when execute LsvGroupList_ItemChecked event: ", ex);
+                MessageBox.Show(ex.Message);
             }
         }
 
         private void LsvGroupMember_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            WeChatEngine.Instance.SelectedMemberOfGroup = null;
-            if (e.Item.Checked)
+            try
             {
-                ResetListViewCheckedStatus(this.lsvGroupMember, e.Item.Index);
-                WeChatEngine.Instance.SelectedMemberOfGroup = (FriendInfoModel)e.Item.Tag;
+                WeChatEngine.Instance.SelectedMemberOfGroup = null;
+                if (e.Item.Checked)
+                {
+                    ResetListViewCheckedStatus(this.lsvGroupMember, e.Item.Index);
+                    WeChatEngine.Instance.SelectedMemberOfGroup = (FriendInfoModel)e.Item.Tag;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when execute LsvGroupMember_ItemChecked event: ", ex);
+                MessageBox.Show(ex.Message);
             }
         }
 
         private void BtnSendMsg_Click(object sender, EventArgs e)
         {
-            string message = txtMessage.Text.Trim();
-            if (string.IsNullOrWhiteSpace(message)) return;
+            try
+            {
+                string message = txtMessage.Text.Trim();
+                if (string.IsNullOrWhiteSpace(message)) return;
 
-            if (WeChatEngine.Instance.SelectedMemberOfGroup != null)
+                if (WeChatEngine.Instance.SelectedMemberOfGroup != null)
+                {
+                    WeChatEngine.Instance.SendGroupMessageEx(message);
+                    AfterSendMsg();
+                }
+                else if (WeChatEngine.Instance.SelectedGroup != null)
+                {
+                    WeChatEngine.Instance.SendGroupMessage(message);
+                    AfterSendMsg();
+                }
+                else
+                {
+                    MessageBox.Show("请先选择一个群或群里某个成员！");
+                }
+            } 
+            catch (Exception ex)
             {
-                WeChatEngine.Instance.SendGroupMessageEx(message);
-                AfterSendMsg();
-            }
-            else if (WeChatEngine.Instance.SelectedGroup != null)
-            {
-                WeChatEngine.Instance.SendGroupMessage(message);
-                AfterSendMsg();
-            }
-            else
-            {
-                MessageBox.Show("请先选择一个群或群里某个成员！");
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when send message: ", ex);
+                MessageBox.Show(ex.Message);
             }
         }
 
