@@ -19,6 +19,8 @@ namespace WX.Hook.UI
 {
     public partial class frmDemo : Form
     {
+        private BackgroundWorker m_BackgroundWorker;
+
         public frmDemo()
         {
             InitializeComponent();
@@ -31,6 +33,7 @@ namespace WX.Hook.UI
             this.lsvGroupList.ItemChecked += LsvGroupList_ItemChecked;
             this.lsvGroupMember.ItemChecked += LsvGroupMember_ItemChecked;
             this.btnSendMsg.Click += BtnSendMsg_Click;
+            this.btnSendMsgAuto.Click += BtnSendMsgAuto_Click;
         }
 
         #region Control Event
@@ -184,12 +187,12 @@ namespace WX.Hook.UI
 
                 if (WeChatEngine.Instance.SelectedMemberOfGroup != null)
                 {
-                    WeChatEngine.Instance.SendGroupMessageEx(message);
+                    WeChatEngine.Instance.SendGroupMessageEx(0, message);
                     AfterSendMsg();
                 }
                 else if (WeChatEngine.Instance.SelectedGroup != null)
                 {
-                    WeChatEngine.Instance.SendGroupMessage(message);
+                    WeChatEngine.Instance.SendGroupMessage(0, message);
                     AfterSendMsg();
                 }
                 else
@@ -202,6 +205,36 @@ namespace WX.Hook.UI
                 LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when send message: ", ex);
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void BtnSendMsgAuto_Click(object sender, EventArgs e)
+        {
+            /*
+            chkStopTest.Checked = false;
+            int delayTime = CommonUtil.GetObjTranNull<int>(txtTime.Text.Trim());
+            string message = "自动测试：同事聊天，说到家长里短，一人问一男老师，你家生气不？这位摸着脑袋，想了半天，才慢条斯理地说：“都挺忙的，生气？哪有时间啊”。他的话，把所有人都说乐了。";
+
+            
+            
+            while (!chkStopTest.Checked)
+            {
+                try
+                {
+                    if (WeChatEngine.Instance.SelectedMemberOfGroup != null)
+                    {
+                        WeChatEngine.Instance.SendGroupMessageEx(delayTime, message);
+                    }
+                    else if (WeChatEngine.Instance.SelectedGroup != null)
+                    {
+                        WeChatEngine.Instance.SendGroupMessage(delayTime, message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when auto-send message: ", ex);
+                }
+            }
+            */
         }
 
         private void Form2_FormClosing(object sender, FormClosingEventArgs e)

@@ -100,6 +100,9 @@ namespace WX.Hook.Service
             ref STARTUPINFO lpStartupInfo,
             ref PROCESS_INFORMATION lpProcessInformation
             );
+
+        [DllImport("kernel32.dll")]
+        private static extern int ResumeThread(IntPtr hThread);
         #endregion
 
         #region Win32 API For Inject WeDll
@@ -201,7 +204,7 @@ namespace WX.Hook.Service
         /// 通过系统API启动微信
         /// </summary>
         /// <returns></returns>
-        private static int OpenWechat(string wechatPath)
+        private static PROCESS_INFORMATION OpenWechat(string wechatPath)
         {
             STARTUPINFO sInfo = new STARTUPINFO();
             PROCESS_INFORMATION pInfo = new PROCESS_INFORMATION();
@@ -212,7 +215,8 @@ namespace WX.Hook.Service
             }
             else
             {
-                return pInfo.dwProcessId;
+                //return pInfo.dwProcessId;
+                return pInfo;
             }
         }
 
@@ -225,7 +229,8 @@ namespace WX.Hook.Service
             string dllName      = "WeDll.dll";
             uint dllLength      = (uint)((dllName.Length + 1) * Marshal.SizeOf(typeof(char)));
             string wechatPath   = GetWechatPath();
-            int wechatProcessID = OpenWechat(wechatPath);
+            var pInfo           = OpenWechat(wechatPath);
+            int wechatProcessID = pInfo.dwProcessId;
             //下面开始注入 WeDll.dll 到 WeChat
             if (wechatProcessID > 0)
             {
@@ -266,6 +271,10 @@ namespace WX.Hook.Service
                 }
 
                 LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Injected WeDll successfully!");
+                
+                //启动线程
+                ResumeThread(pInfo.hThread);
+
                 return wechatProcessID;
             }
             else
@@ -274,17 +283,24 @@ namespace WX.Hook.Service
             }
         }
 
-        private static Task SendWeDllCmd(Socket socket, WxInfoModel wx, WeDllCmd dllCmd, string msg)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="wx"></param>
+        /// <param name="dllCmd"></param>
+        /// <param name="msg"></param>
+        /// <param name="delayTime">延时时间。单位：毫秒</param>
+        /// <returns></returns>
+        private static Task SendWeDllCmd(Socket socket, WxInfoModel wx, WeDllCmd dllCmd, string msg, int delayTime)
         {
             Task task = Task.Run(() => 
             {
                 try
                 {
-                    if (dllCmd == WeDllCmd.WX_CMD_TYPE_E_MSG_READ)
-                    {
-                        Thread.Sleep(2000);
-                    }
-
+                    
+                    if (delayTime > 0 ) Thread.Sleep(delayTime);
+                    
                     byte[] buff = new byte[1004];
 
                     int type = (int)dllCmd;
@@ -312,19 +328,17 @@ namespace WX.Hook.Service
                 {
                     try
                     {
+                        //每隔 100 秒检测 Socket 是否有可读的消息
                         bool SocketCanRead = socket.Poll(100, SelectMode.SelectRead);
-                        LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Socket can read? [{0}]", SocketCanRead);
                         if (!SocketCanRead) continue;
+                        LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Socket can read? [{0}]", SocketCanRead);
 
                         byte[] data = new byte[1004];
                         EndPoint remoteAddr = new IPEndPoint(IPAddress.Any, 0);
                         int count = socket.ReceiveFrom(data, ref remoteAddr);
-                        LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Remote Address: [{0}], Receive Data Size: [{1}]", remoteAddr, count);
+                        //LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("Remote Address: [{0}], Receive Data Size: [{1}]", remoteAddr, count);
                         if (count == 0) continue;
-
-                        //byte[] ret = new byte[count];
-                        //Array.Copy(data, ret, count);
-
+                        
                         byte[] b1 = new byte[4];
                         byte[] b2 = new byte[1001];
 
@@ -356,7 +370,7 @@ namespace WX.Hook.Service
         /// <param name="msg"></param>
         public static void ReceiveWxMessage(Socket socket, WxInfoModel wx)
         {
-            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_MSG_READ, "");
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_MSG_READ, "", 2000);
         }
 
         /// <summary>
@@ -367,7 +381,7 @@ namespace WX.Hook.Service
         /// <param name="msg">消息格式：0，1，2这样的数字，获取的是第几个好友。默认从0开始获取</param>
         public static void GetWXFriendList(Socket socket, WxInfoModel wx, string msg = "0")
         {
-            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_FRIEND_INFO, msg);
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_FRIEND_INFO, msg, 0);
         }
 
         /// <summary>
@@ -378,7 +392,7 @@ namespace WX.Hook.Service
         /// <param name="msg">消息格式：0，1，2这样的数字，获取的是第几个群。默认从0开始获取</param>
         public static void GetWXGroupList(Socket socket, WxInfoModel wx, string msg = "0")
         {
-            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_INFO, msg);
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_INFO, msg, 0);
         }
 
         /// <summary>
@@ -392,7 +406,7 @@ namespace WX.Hook.Service
         {
             string groupMemberMsg = string.Format("{0}|{1}", memberPosition, groupOrigID);
             LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeDll GetWXGroupMemberList Msg: [{0}]", groupMemberMsg);
-            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO, groupMemberMsg);
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO, groupMemberMsg, 0);
         }
 
         /// <summary>
@@ -403,11 +417,11 @@ namespace WX.Hook.Service
         /// <param name="groupOrigID">群ID</param>
         /// <param name="msgContent">消息内容</param>
         /// <param name="msgType">消息类型：0位文字，1位图片，2为文件。默认为0</param>
-        public static void SendGroupMessage(Socket socket, WxInfoModel wx, string groupOrigID, string msgContent, string msgType = "0")
+        public static void SendGroupMessage(Socket socket, WxInfoModel wx, string groupOrigID, string msgContent, string msgType, int delayTime)
         {
             string msg = string.Format("{0}|{1}|{2}", groupOrigID, msgContent, msgType);
             LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeDll SendGroupMessage Msg: [{0}]", msg);
-            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_SEND_MSG_2, msg);
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_SEND_MSG_2, msg, delayTime);
         }
 
         /// <summary>
@@ -418,11 +432,11 @@ namespace WX.Hook.Service
         /// <param name="memberOrigID"></param>
         /// <param name="groupOrigID"></param>
         /// <param name="msgContent"></param>
-        public static void SendGroupMessageEx(Socket socket, WxInfoModel wx, string memberOrigID, string groupOrigID, string msgContent)
+        public static void SendGroupMessageEx(Socket socket, WxInfoModel wx, string memberOrigID, string groupOrigID, string msgContent, int delayTime)
         {
             string msg = string.Format("{0}|{1}|{2}", groupOrigID, memberOrigID, msgContent);
             LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeDll SendGroupMessageEx Msg: [{0}]", msg);
-            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_AT_GROUP_MEMBER_MSG, msg);
+            SendWeDllCmd(socket, wx, WeDllCmd.WX_CMD_TYPE_E_AT_GROUP_MEMBER_MSG, msg, delayTime);
         }
         #endregion
     }

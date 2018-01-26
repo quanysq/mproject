@@ -14,7 +14,8 @@ namespace WX.Hook.Service
 {
     public class WeChatEngine : IWeChatEngine
     {
-        private static WeChatEngine instance = null;
+        private static volatile WeChatEngine instance = null;
+        private static object lockForMultiThread = new object();
         private static Socket _SocketClient = null;
 
         private WeChatEngine()
@@ -28,11 +29,50 @@ namespace WX.Hook.Service
             {
                 if (instance == null)
                 {
-                    instance = new WeChatEngine();
+                    lock (lockForMultiThread)
+                    {
+                        if (instance == null)
+                        {
+                            instance = new WeChatEngine();
+                        }
+                    }  
                 }
                 return instance;
             }
         }
+
+        #region 属性
+        List<WxInfoModel> _WxLoggedinList = new List<WxInfoModel>();
+        public List<WxInfoModel> WxLoggedinList
+        {
+            get { return _WxLoggedinList; }
+        }
+
+        /// <summary>
+        /// 当前选中的微信
+        /// </summary>
+        public WxInfoModel SelectedWx { get; set; }
+
+        /// <summary>
+        /// 当前选中的群
+        /// </summary>
+        public GroupInfoModel SelectedGroup { get; set; }
+
+        /// <summary>
+        /// 当前选中的好友
+        /// </summary>
+        public FriendInfoModel SelectedFriend { get; set; }
+
+        /// <summary>
+        /// 当前选中的群成员
+        /// </summary>
+        public FriendInfoModel SelectedMemberOfGroup { get; set; }
+        
+        /// <summary>
+        /// 自动接收消息的微信
+        /// </summary>
+        public WxInfoModel AutoReceiveDataWx { get; set; }
+        #endregion
 
         /// <summary>
         /// 初始化 Socket
@@ -61,18 +101,7 @@ namespace WX.Hook.Service
                 LogHelper.WXLogger.WXHOOKUI.Error("Init Socket Error: ", ex);
             }
         }
-
-        List<WxInfoModel> _WxLoggedinList = new List<WxInfoModel>();
-        public List<WxInfoModel> WxLoggedinList
-        {
-            get { return _WxLoggedinList; }
-        }
-
-        public WxInfoModel SelectedWx { get; set; }
-        public GroupInfoModel SelectedGroup { get; set; }
-        public FriendInfoModel SelectedFriend { get; set; }
-        public FriendInfoModel SelectedMemberOfGroup { get; set; }
-
+        
         public void CloseWeChat()
         {
             Process[] processList = Process.GetProcessesByName("WeChat");
@@ -170,17 +199,28 @@ namespace WX.Hook.Service
 
         public void ReceiveWxMessage()
         {
-            if (SelectedWx == null) return;
-            bool resultCheck = CheckNetwork(SelectedWx);
+            WxInfoModel wx = null;
+            if (AutoReceiveDataWx != null)
+            {
+                wx = AutoReceiveDataWx;
+            }
+            else if (SelectedWx != null)
+            {
+                wx = SelectedWx;
+            }
+            else
+            {
+                return;
+            }
+            bool resultCheck = CheckNetwork(wx);
             if (!resultCheck) return;
-            WeDll.ReceiveWxMessage(_SocketClient, SelectedWx);
+            WeDll.ReceiveWxMessage(_SocketClient, wx);
         }
 
         public void ReceiveDataFromWeDll(Action<CallBackType, object> callback)
         {
             WeDll.ReceiveDataFromWeDllUsingUdp(_SocketClient, (type, msg, receiveAddr) => 
             {
-                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO_ACK type is [{0}]", (int)WeDllCmd.WX_CMD_TYPE_E_GET_WX_GROUP_MEMBER_INFO_ACK);
                 LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("ReceiveDataFromWeDllUsingUdp receiveAddr: [{2}], type: [{0}], msg: [{1}]", type, msg, receiveAddr);
 
                 //微信登录
@@ -229,6 +269,7 @@ namespace WX.Hook.Service
                 Addr        = receiveAddr
             };
             _WxLoggedinList.Add(wxInfo);
+            if (_WxLoggedinList.Count == 2) AutoReceiveDataWx = wxInfo;
             callback(CallBackType.LoginSuccess, wxInfo);
         }
 
@@ -320,7 +361,7 @@ namespace WX.Hook.Service
         }
         #endregion
 
-        public void SendGroupMessage(string msgContent, string msgType = "0")
+        public void SendGroupMessage(int delayTime, string msgContent, string msgType = "0")
         {
             if (SelectedWx == null)
             {
@@ -339,10 +380,10 @@ namespace WX.Hook.Service
             }
 
             string groupOrigID = SelectedGroup.Group_Orig_ID;
-            WeDll.SendGroupMessage(_SocketClient, SelectedWx, groupOrigID, msgContent, msgType);
+            WeDll.SendGroupMessage(_SocketClient, SelectedWx, groupOrigID, msgContent, msgType, delayTime);
         }
 
-        public void SendGroupMessageEx(string msgContent)
+        public void SendGroupMessageEx(int delayTime, string msgContent)
         {
             if (SelectedWx == null)
             {
@@ -367,7 +408,7 @@ namespace WX.Hook.Service
 
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             string memberOrigID = SelectedMemberOfGroup.Friend_Orig_ID;
-            WeDll.SendGroupMessageEx(_SocketClient, SelectedWx, memberOrigID, groupOrigID, msgContent);
+            WeDll.SendGroupMessageEx(_SocketClient, SelectedWx, memberOrigID, groupOrigID, msgContent, delayTime);
         }
 
         public bool CheckWxExists(int pID)

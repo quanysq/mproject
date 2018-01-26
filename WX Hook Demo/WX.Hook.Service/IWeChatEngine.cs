@@ -43,15 +43,17 @@ namespace WX.Hook.Service
         /// <summary>
         /// 发送普通群消息
         /// </summary>
+        /// <param name="delayTime">延时时间。单位：毫秒</param>
         /// <param name="msgContent"></param>
         /// <param name="msgType"></param>
-        void SendGroupMessage(string msgContent, string msgType = "0");
+        void SendGroupMessage(int delayTime, string msgContent, string msgType = "0");
 
         /// <summary>
         /// 发送群消息：@某人 + 消息
         /// </summary>
+        /// <param name="delayTime">延时时间。单位：毫秒</param>
         /// <param name="msgContent"></param>
-        void SendGroupMessageEx(string msgContent);
+        void SendGroupMessageEx(int delayTime, string msgContent);
 
         /// <summary>
         /// 接收微信消息
