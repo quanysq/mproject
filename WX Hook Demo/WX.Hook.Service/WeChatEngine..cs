@@ -75,29 +75,52 @@ namespace WX.Hook.Service
 
         public void CloseWeChat()
         {
-            foreach (var wxInfo in _WxLoggedinList)
+            Process[] processList = Process.GetProcessesByName("WeChat");
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeChat process number: [{0}]", processList.Length);
+            foreach (var process in processList)
             {
-                int pID = CommonUtil.GetObjTranNull<int>(wxInfo.WxProcessID);
-                Process process = Process.GetProcessById(pID);
-                if (process != null) process.Kill();
+                process.Kill();
+            }
+        }
+
+        private bool NetCheck(WxInfoModel wx)
+        {
+            int pID = CommonUtil.GetObjTranNull<int>(SelectedWx.WxProcessID);
+            bool resultCheck1 = CheckWxExists(pID);
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("NetCheck CheckWxExists: [{0}]", resultCheck1);
+            if (resultCheck1)
+            {
+                bool resultCheck2 = CheckWxOffline();
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("NetCheck CheckWxOffline: [{0}]", resultCheck2);
+                return resultCheck2;
+            }
+            else
+            {
+                return false;
             }
         }
 
         public void GetWXFriendList(string msg = "0")
         {
             if (SelectedWx == null) return;
+            bool resultCheck = NetCheck(SelectedWx);
+            if (!resultCheck) return;
             WeDll.GetWXFriendList(_SocketClient, SelectedWx, msg);
         }
 
         public void GetWXGroupList(string msg = "0")
         {
             if (SelectedWx == null) return;
+            bool resultCheck = NetCheck(SelectedWx);
+            if (!resultCheck) return;
             WeDll.GetWXGroupList(_SocketClient, SelectedWx, msg);
         }
 
         public void GetWXGroupMemberList(string memberPosition = "0")
         {
             if (SelectedWx == null) return;
+            bool resultCheck = NetCheck(SelectedWx);
+            if (!resultCheck) return;
             if (SelectedGroup == null) return;
             string groupOrigID = SelectedGroup.Group_Orig_ID;
             WeDll.GetWXGroupMemberList(_SocketClient, SelectedWx, groupOrigID, memberPosition);
@@ -105,14 +128,23 @@ namespace WX.Hook.Service
 
         public int OpenWeChatAndInjectWeDll()
         {
+            bool resultCheck = CheckWxOffline();
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("OpenWeChatAndInjectWeDll CheckWxOffline: [{0}]", resultCheck);
+            if (resultCheck)
+            {
+                throw new Exception("Network connection failed, please try again later!");
+            }
+
             int pID = WeDll.InjectWeDll();
-            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("WeChat PID: [{0}]", pID);
+            LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("OpenWeChatAndInjectWeDll WeChat PID: [{0}]", pID);
             return pID;
         }
 
         public void ReceiveWxMessage()
         {
             if (SelectedWx == null) return;
+            bool resultCheck = NetCheck(SelectedWx);
+            if (!resultCheck) return;
             WeDll.ReceiveWxMessage(_SocketClient, SelectedWx);
         }
 
@@ -278,16 +310,36 @@ namespace WX.Hook.Service
             WeDll.SendGroupMessageEx(_SocketClient, SelectedWx, memberOrigID, groupOrigID, msgContent);
         }
 
-        public bool CheckWxOnline(WxInfoModel wx)
+        public bool CheckWxExists(int pID)
         {
-            int pID = CommonUtil.GetObjTranNull<int>(wx.WxProcessID);
-            Process p = Process.GetProcessById(pID);
-            if (p == null)
+            try
             {
+                Process p = Process.GetProcessById(pID);
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("CheckWxOnline: [{0}]", p.Id);
+                return true;
+            }
+            catch (ArgumentException ex)
+            {
+                LogHelper.WXLogger.WXHOOKSERVICE.Error("CheckWxOnline Error: ", ex);
                 return false;
             }
+        }
 
-            return true;
+        public void CheckWxExistsLoop(int pID, Action<int> callback)
+        {
+            Task.Run(() => 
+            {
+                while (true)
+                {
+                    bool resultCheckWxOnline = CheckWxExists(pID);
+                    if (!resultCheckWxOnline)
+                    {
+                        callback(pID);
+                    }
+                    Thread.Sleep(5000); //每5秒检测一次
+                }
+            });
+            
         }
 
         public bool CheckWxOffline()
@@ -302,7 +354,8 @@ namespace WX.Hook.Service
                 int intTimeout = 120;
                 PingReply objPinReply = objPingSender.Send("www.baidu.com", intTimeout, buffer, objPinOptions);
                 string strInfo = objPinReply.Status.ToString();
-                if (strInfo == "Success")
+                LogHelper.WXLogger.WXHOOKSERVICE.InfoFormat("CheckWxOffline result: [{0}]", strInfo);
+                if (strInfo.Equals("Success", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -313,9 +366,25 @@ namespace WX.Hook.Service
             }
             catch (Exception ex)
             {
-                LogHelper.WXLogger.WXHOOKUI.Error("PingIpOrDomainName Error: ", ex);
+                LogHelper.WXLogger.WXHOOKUI.Error("CheckWxOffline Error: ", ex);
                 return false;
             }
+        }
+
+        public void CheckWxOfflineLoop(Action callback)
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    bool resultCheckWxOffline = CheckWxOffline();
+                    if (!resultCheckWxOffline)
+                    {
+                        callback();
+                    }
+                    Thread.Sleep(1000 * 15); //每15秒检测一次
+                }
+            });
         }
 
         /// <summary>

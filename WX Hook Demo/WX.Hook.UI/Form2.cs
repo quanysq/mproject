@@ -36,12 +36,31 @@ namespace WX.Hook.UI
         #region Control Event
         private void Form2_Load(object sender, EventArgs e)
         {
+            lbError.Text = "";
+
             HandleMessageFromWeDll();
         }
 
         private void BtnOpenWeChat_Click(object sender, EventArgs e)
         {
-            WeChatEngine.Instance.OpenWeChatAndInjectWeDll();
+            try
+            {
+                int pID = WeChatEngine.Instance.OpenWeChatAndInjectWeDll();
+                if (pID > 0)
+                {
+                    WeChatEngine.Instance.CheckWxExistsLoop(pID, (wxPID) =>
+                    {
+                        SafeInvoke(() =>
+                        {
+                            lbError.Text = string.Format("微信进程 {0} 已经退出", wxPID);
+                        });
+                    });
+                }
+            } catch (Exception ex)
+            {
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when open new Wechat: ", ex);
+                MessageBox.Show(ex.Message);
+            }
         }
         
         private void LsvWxLoggedin_ItemChecked(object sender, ItemCheckedEventArgs e)
@@ -136,8 +155,8 @@ namespace WX.Hook.UI
 
         private void Form2_FormClosing(object sender, FormClosingEventArgs e)
         {
-            WeChatEngine.Instance.CloseWeChat();
             WeChatEngine.Instance.SafeCloseSocket();
+            WeChatEngine.Instance.CloseWeChat();
             Environment.Exit(0);
         }
         #endregion
@@ -155,7 +174,20 @@ namespace WX.Hook.UI
                     switch (callbacktype)
                     {
                         case CallBackType.LoginSuccess:
+                            LogHelper.WXLogger.WXHOOKUI.InfoFormat("lsvWxLoggedin.Items.Count: [{0}]", lsvWxLoggedin.Items.Count);
+                            if (lsvWxLoggedin.Items.Count > 0)
+                            {
+                                //如果 lsvWxLoggedin 项大于 0，取消订阅 ItemChecked 事件，避免触发
+                                lsvWxLoggedin.ItemChecked -= LsvWxLoggedin_ItemChecked;
+                            }
+                            //处理微信登录信息
                             HandleMessageForLoginSuccess(obj);
+                            //添加微信之后再加此事件
+                            if (lsvWxLoggedin.Items.Count > 1)
+                            {
+                                //如果 lsvWxLoggedin 项大于 1，重新订阅 ItemChecked 事件
+                                lsvWxLoggedin.ItemChecked += LsvWxLoggedin_ItemChecked;
+                            }
                             break;
                         case CallBackType.ReceiveMsg:
                             HandleMessageForReceiveMsg(obj);
@@ -194,12 +226,41 @@ namespace WX.Hook.UI
                 lsvWxLoggedin.Items[0].Checked = true;
             }
         }
-        
+
         private void HandleMessageForReceiveMsg(object obj)
         {
             string msg                 = CommonUtil.GetObjTranNull<string>(obj);
+            string[] msgInfo           = msg.Split('|');
+            LogHelper.WXLogger.WXHOOKUI.InfoFormat("HandleMessageForReceiveMsg msgInfo length: [{0}]", msgInfo.Length);
+            if (msgInfo.Length < 3) return;
+            if (msgInfo[1].Equals("weixin", StringComparison.OrdinalIgnoreCase)) return;
+            if (msgInfo[1].Equals(msgInfo[0], StringComparison.OrdinalIgnoreCase)) return;
+
+            LogHelper.WXLogger.WXHOOKUI.DebugFormat("HandleMessageForReceiveMsg msgInfo 0: [{0}]", msgInfo[0]);
+            LogHelper.WXLogger.WXHOOKUI.DebugFormat("HandleMessageForReceiveMsg msgInfo 1: [{0}]", msgInfo[1]);
+            LogHelper.WXLogger.WXHOOKUI.DebugFormat("HandleMessageForReceiveMsg msgInfo 2: [{0}]", msgInfo[2]);
+
             ListViewItem lviReciveData = new ListViewItem();
-            lviReciveData.Text         = msg;
+            lviReciveData.Text         = msgInfo[0];        //微信号
+            #region 获取群名称
+            string groupNickName       = msgInfo[1];
+            var group = WeChatEngine.Instance.SelectedWx.GroupList.Find(x => x.Group_Orig_ID.Equals(msgInfo[1], StringComparison.OrdinalIgnoreCase));
+            if (group != null) groupNickName = group.Nick;
+            #endregion
+            lviReciveData.SubItems.Add(groupNickName);      //群名称
+            lviReciveData.SubItems.Add(msgInfo[1]);         //群ID
+            string[] noteInfo = msgInfo[2].Split(':');
+            #region 获取发送人名称
+            string sendNickName = noteInfo[0];
+            if (group != null)
+            {
+                var member = group.MemberList.Find(x => x.Friend_Orig_ID.Equals(noteInfo[0], StringComparison.OrdinalIgnoreCase));
+                if (member != null) sendNickName = noteInfo[0];
+            }
+            #endregion
+            lviReciveData.SubItems.Add(sendNickName);       //发送人名称
+            lviReciveData.SubItems.Add(noteInfo[0]);        //发送人ID
+            lviReciveData.SubItems.Add(noteInfo[noteInfo.Length - 1]);     //内容
             this.lsvReciveData.BeginUpdate();
             this.lsvReciveData.Items.Add(lviReciveData);
             this.lsvReciveData.EndUpdate();

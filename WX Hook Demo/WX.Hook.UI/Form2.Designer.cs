@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.tlpWhole = new System.Windows.Forms.TableLayoutPanel();
-            this.btnOpenWeChat = new System.Windows.Forms.Button();
             this.tlpUnder = new System.Windows.Forms.TableLayoutPanel();
             this.tlpLeft = new System.Windows.Forms.TableLayoutPanel();
             this.gbWxLoggedin = new System.Windows.Forms.GroupBox();
@@ -51,11 +50,19 @@
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tlpRight = new System.Windows.Forms.TableLayoutPanel();
             this.gbReciveData = new System.Windows.Forms.GroupBox();
+            this.btnOpenWeChat = new System.Windows.Forms.Button();
             this.lsvReciveData = new System.Windows.Forms.ListView();
+            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_content = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tlpSendMsg = new System.Windows.Forms.TableLayoutPanel();
             this.btnSendMsg = new System.Windows.Forms.Button();
             this.txtMessage = new System.Windows.Forms.TextBox();
+            this.tlpTop = new System.Windows.Forms.TableLayoutPanel();
+            this.lbError = new System.Windows.Forms.Label();
             this.tlpWhole.SuspendLayout();
             this.tlpUnder.SuspendLayout();
             this.tlpLeft.SuspendLayout();
@@ -66,14 +73,15 @@
             this.tlpRight.SuspendLayout();
             this.gbReciveData.SuspendLayout();
             this.tlpSendMsg.SuspendLayout();
+            this.tlpTop.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlpWhole
             // 
             this.tlpWhole.ColumnCount = 1;
             this.tlpWhole.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpWhole.Controls.Add(this.btnOpenWeChat, 0, 0);
             this.tlpWhole.Controls.Add(this.tlpUnder, 0, 1);
+            this.tlpWhole.Controls.Add(this.tlpTop, 0, 0);
             this.tlpWhole.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlpWhole.Location = new System.Drawing.Point(0, 0);
             this.tlpWhole.Name = "tlpWhole";
@@ -83,15 +91,6 @@
             this.tlpWhole.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tlpWhole.Size = new System.Drawing.Size(1481, 821);
             this.tlpWhole.TabIndex = 0;
-            // 
-            // btnOpenWeChat
-            // 
-            this.btnOpenWeChat.Location = new System.Drawing.Point(3, 3);
-            this.btnOpenWeChat.Name = "btnOpenWeChat";
-            this.btnOpenWeChat.Size = new System.Drawing.Size(109, 44);
-            this.btnOpenWeChat.TabIndex = 0;
-            this.btnOpenWeChat.Text = "打开微信";
-            this.btnOpenWeChat.UseVisualStyleBackColor = true;
             // 
             // tlpUnder
             // 
@@ -301,9 +300,23 @@
             this.gbReciveData.TabStop = false;
             this.gbReciveData.Text = "接收消息";
             // 
+            // btnOpenWeChat
+            // 
+            this.btnOpenWeChat.Location = new System.Drawing.Point(3, 3);
+            this.btnOpenWeChat.Name = "btnOpenWeChat";
+            this.btnOpenWeChat.Size = new System.Drawing.Size(109, 38);
+            this.btnOpenWeChat.TabIndex = 0;
+            this.btnOpenWeChat.Text = "打开微信";
+            this.btnOpenWeChat.UseVisualStyleBackColor = true;
+            // 
             // lsvReciveData
             // 
             this.lsvReciveData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader10,
+            this.columnHeader11,
+            this.columnHeader14,
+            this.columnHeader12,
+            this.columnHeader13,
             this.ch_content});
             this.lsvReciveData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lsvReciveData.Location = new System.Drawing.Point(3, 16);
@@ -313,10 +326,34 @@
             this.lsvReciveData.UseCompatibleStateImageBehavior = false;
             this.lsvReciveData.View = System.Windows.Forms.View.Details;
             // 
+            // columnHeader10
+            // 
+            this.columnHeader10.Text = "微信号";
+            this.columnHeader10.Width = 80;
+            // 
+            // columnHeader11
+            // 
+            this.columnHeader11.Text = "群名称";
+            this.columnHeader11.Width = 80;
+            // 
+            // columnHeader14
+            // 
+            this.columnHeader14.Text = "群 ID";
+            // 
+            // columnHeader12
+            // 
+            this.columnHeader12.Text = "发送人名称";
+            this.columnHeader12.Width = 80;
+            // 
+            // columnHeader13
+            // 
+            this.columnHeader13.Text = "发送人";
+            this.columnHeader13.Width = 80;
+            // 
             // ch_content
             // 
-            this.ch_content.Text = "消息内容";
-            this.ch_content.Width = 1000;
+            this.ch_content.Text = "内容";
+            this.ch_content.Width = 800;
             // 
             // tlpSendMsg
             // 
@@ -342,7 +379,7 @@
             this.btnSendMsg.Name = "btnSendMsg";
             this.btnSendMsg.Size = new System.Drawing.Size(1015, 31);
             this.btnSendMsg.TabIndex = 0;
-            this.btnSendMsg.Text = "发送消息";
+            this.btnSendMsg.Text = "发送群消息";
             this.btnSendMsg.UseVisualStyleBackColor = true;
             // 
             // txtMessage
@@ -355,6 +392,32 @@
             this.txtMessage.Name = "txtMessage";
             this.txtMessage.Size = new System.Drawing.Size(1015, 141);
             this.txtMessage.TabIndex = 1;
+            // 
+            // tlpTop
+            // 
+            this.tlpTop.ColumnCount = 2;
+            this.tlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 115F));
+            this.tlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpTop.Controls.Add(this.btnOpenWeChat, 0, 0);
+            this.tlpTop.Controls.Add(this.lbError, 1, 0);
+            this.tlpTop.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlpTop.Location = new System.Drawing.Point(3, 3);
+            this.tlpTop.Name = "tlpTop";
+            this.tlpTop.RowCount = 1;
+            this.tlpTop.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpTop.Size = new System.Drawing.Size(1475, 44);
+            this.tlpTop.TabIndex = 2;
+            // 
+            // lbError
+            // 
+            this.lbError.AutoSize = true;
+            this.lbError.Font = new System.Drawing.Font("Microsoft Sans Serif", 27F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lbError.ForeColor = System.Drawing.Color.Red;
+            this.lbError.Location = new System.Drawing.Point(118, 0);
+            this.lbError.Name = "lbError";
+            this.lbError.Size = new System.Drawing.Size(113, 40);
+            this.lbError.TabIndex = 1;
+            this.lbError.Text = "label1";
             // 
             // frmDemo
             // 
@@ -375,6 +438,8 @@
             this.gbReciveData.ResumeLayout(false);
             this.tlpSendMsg.ResumeLayout(false);
             this.tlpSendMsg.PerformLayout();
+            this.tlpTop.ResumeLayout(false);
+            this.tlpTop.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -409,5 +474,12 @@
         private System.Windows.Forms.TableLayoutPanel tlpSendMsg;
         private System.Windows.Forms.Button btnSendMsg;
         private System.Windows.Forms.TextBox txtMessage;
+        private System.Windows.Forms.ColumnHeader columnHeader10;
+        private System.Windows.Forms.ColumnHeader columnHeader11;
+        private System.Windows.Forms.ColumnHeader columnHeader12;
+        private System.Windows.Forms.ColumnHeader columnHeader13;
+        private System.Windows.Forms.ColumnHeader columnHeader14;
+        private System.Windows.Forms.TableLayoutPanel tlpTop;
+        private System.Windows.Forms.Label lbError;
     }
 }

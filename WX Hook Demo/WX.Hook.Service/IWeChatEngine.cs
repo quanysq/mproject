@@ -65,17 +65,29 @@ namespace WX.Hook.Service
         void ReceiveWxMessage();
 
         /// <summary>
-        /// 通过线程检查微信闪退
+        /// 通过线程检查微信闪退(单次)
         /// </summary>
-        /// <returns></returns>
-        bool CheckWxOnline(WxInfoModel wx);
+        /// <param name="pID"></param>
+        bool CheckWxExists(int pID);
 
         /// <summary>
-        /// 通过网络检查微信是否掉线
+        /// 通过线程检查微信闪退(循环)
+        /// </summary>
+        /// <param name="pID"></param>
+        void CheckWxExistsLoop(int pID, Action<int> callback);
+
+        /// <summary>
+        /// 通过网络检查微信是否掉线(单次)
+        /// </summary>
+        /// <param name="callback"></param>
+        bool CheckWxOffline();
+
+        /// <summary>
+        /// 通过网络检查微信是否掉线(循环)
         /// </summary>
         /// <param name="strIpOrDName"></param>
         /// <returns></returns>
-        bool CheckWxOffline();
+        void CheckWxOfflineLoop(Action callback);
 
     }
 }
