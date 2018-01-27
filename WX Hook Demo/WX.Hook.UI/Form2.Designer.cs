@@ -50,7 +50,6 @@
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tlpRight = new System.Windows.Forms.TableLayoutPanel();
             this.gbReciveData = new System.Windows.Forms.GroupBox();
-            this.btnSendMsg = new System.Windows.Forms.Button();
             this.lsvReciveData = new System.Windows.Forms.ListView();
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -60,15 +59,15 @@
             this.ch_content = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tlpSendMsg = new System.Windows.Forms.TableLayoutPanel();
             this.txtMessage = new System.Windows.Forms.TextBox();
-            this.tlpSendMsg2 = new System.Windows.Forms.TableLayoutPanel();
+            this.tlpUnder2 = new System.Windows.Forms.TableLayoutPanel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtTime = new System.Windows.Forms.TextBox();
+            this.chkStopTest = new System.Windows.Forms.CheckBox();
+            this.btnSendMsg = new System.Windows.Forms.Button();
             this.tlpTop = new System.Windows.Forms.TableLayoutPanel();
             this.btnOpenWeChat = new System.Windows.Forms.Button();
             this.lbError = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txtTime = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.btnSendMsgAuto = new System.Windows.Forms.Button();
-            this.chkStopTest = new System.Windows.Forms.CheckBox();
             this.tlpWhole.SuspendLayout();
             this.tlpUnder.SuspendLayout();
             this.tlpLeft.SuspendLayout();
@@ -79,7 +78,7 @@
             this.tlpRight.SuspendLayout();
             this.gbReciveData.SuspendLayout();
             this.tlpSendMsg.SuspendLayout();
-            this.tlpSendMsg2.SuspendLayout();
+            this.tlpUnder2.SuspendLayout();
             this.tlpTop.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -307,18 +306,6 @@
             this.gbReciveData.TabStop = false;
             this.gbReciveData.Text = "接收消息";
             // 
-            // btnSendMsg
-            // 
-            this.btnSendMsg.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSendMsg.Location = new System.Drawing.Point(673, 3);
-            this.btnSendMsg.Name = "btnSendMsg";
-            this.btnSendMsg.Size = new System.Drawing.Size(339, 43);
-            this.btnSendMsg.TabIndex = 0;
-            this.btnSendMsg.Text = "手动发送群消息";
-            this.btnSendMsg.UseVisualStyleBackColor = true;
-            // 
             // lsvReciveData
             // 
             this.lsvReciveData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -370,7 +357,7 @@
             this.tlpSendMsg.ColumnCount = 1;
             this.tlpSendMsg.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpSendMsg.Controls.Add(this.txtMessage, 0, 0);
-            this.tlpSendMsg.Controls.Add(this.tlpSendMsg2, 0, 1);
+            this.tlpSendMsg.Controls.Add(this.tlpUnder2, 0, 1);
             this.tlpSendMsg.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlpSendMsg.Location = new System.Drawing.Point(3, 572);
             this.tlpSendMsg.Name = "tlpSendMsg";
@@ -391,28 +378,82 @@
             this.txtMessage.Size = new System.Drawing.Size(1015, 123);
             this.txtMessage.TabIndex = 1;
             // 
-            // tlpSendMsg2
+            // tlpUnder2
             // 
-            this.tlpSendMsg2.ColumnCount = 6;
-            this.tlpSendMsg2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tlpSendMsg2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.tlpSendMsg2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
-            this.tlpSendMsg2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
-            this.tlpSendMsg2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
-            this.tlpSendMsg2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpSendMsg2.Controls.Add(this.btnSendMsgAuto, 3, 0);
-            this.tlpSendMsg2.Controls.Add(this.label2, 2, 0);
-            this.tlpSendMsg2.Controls.Add(this.label1, 0, 0);
-            this.tlpSendMsg2.Controls.Add(this.txtTime, 1, 0);
-            this.tlpSendMsg2.Controls.Add(this.btnSendMsg, 5, 0);
-            this.tlpSendMsg2.Controls.Add(this.chkStopTest, 4, 0);
-            this.tlpSendMsg2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlpSendMsg2.Location = new System.Drawing.Point(3, 132);
-            this.tlpSendMsg2.Name = "tlpSendMsg2";
-            this.tlpSendMsg2.RowCount = 1;
-            this.tlpSendMsg2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpSendMsg2.Size = new System.Drawing.Size(1015, 49);
-            this.tlpSendMsg2.TabIndex = 2;
+            this.tlpUnder2.ColumnCount = 5;
+            this.tlpUnder2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpUnder2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tlpUnder2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
+            this.tlpUnder2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.tlpUnder2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpUnder2.Controls.Add(this.label2, 2, 0);
+            this.tlpUnder2.Controls.Add(this.label1, 0, 0);
+            this.tlpUnder2.Controls.Add(this.txtTime, 1, 0);
+            this.tlpUnder2.Controls.Add(this.chkStopTest, 3, 0);
+            this.tlpUnder2.Controls.Add(this.btnSendMsg, 4, 0);
+            this.tlpUnder2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlpUnder2.Location = new System.Drawing.Point(3, 132);
+            this.tlpUnder2.Name = "tlpUnder2";
+            this.tlpUnder2.RowCount = 1;
+            this.tlpUnder2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpUnder2.Size = new System.Drawing.Size(1015, 49);
+            this.tlpUnder2.TabIndex = 2;
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.Location = new System.Drawing.Point(103, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(54, 49);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "秒发送";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.Location = new System.Drawing.Point(3, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(44, 49);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "每隔";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // txtTime
+            // 
+            this.txtTime.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.txtTime.Location = new System.Drawing.Point(53, 14);
+            this.txtTime.Name = "txtTime";
+            this.txtTime.Size = new System.Drawing.Size(44, 20);
+            this.txtTime.TabIndex = 2;
+            this.txtTime.Text = "3";
+            // 
+            // chkStopTest
+            // 
+            this.chkStopTest.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.chkStopTest.AutoSize = true;
+            this.chkStopTest.Location = new System.Drawing.Point(163, 16);
+            this.chkStopTest.Name = "chkStopTest";
+            this.chkStopTest.Size = new System.Drawing.Size(134, 17);
+            this.chkStopTest.TabIndex = 5;
+            this.chkStopTest.Text = "自动测试发送群消息";
+            this.chkStopTest.UseVisualStyleBackColor = true;
+            // 
+            // btnSendMsg
+            // 
+            this.btnSendMsg.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSendMsg.Location = new System.Drawing.Point(363, 3);
+            this.btnSendMsg.Name = "btnSendMsg";
+            this.btnSendMsg.Size = new System.Drawing.Size(649, 43);
+            this.btnSendMsg.TabIndex = 0;
+            this.btnSendMsg.Text = "发送群消息";
+            this.btnSendMsg.UseVisualStyleBackColor = true;
             // 
             // tlpTop
             // 
@@ -449,64 +490,6 @@
             this.lbError.TabIndex = 1;
             this.lbError.Text = "label1";
             // 
-            // label1
-            // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.label1.Location = new System.Drawing.Point(3, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(44, 49);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "每隔";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // txtTime
-            // 
-            this.txtTime.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtTime.Location = new System.Drawing.Point(53, 14);
-            this.txtTime.Name = "txtTime";
-            this.txtTime.Size = new System.Drawing.Size(94, 20);
-            this.txtTime.TabIndex = 2;
-            this.txtTime.Text = "1000";
-            // 
-            // label2
-            // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.label2.Location = new System.Drawing.Point(153, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(114, 49);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "毫秒发送";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // btnSendMsgAuto
-            // 
-            this.btnSendMsgAuto.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSendMsgAuto.Location = new System.Drawing.Point(273, 3);
-            this.btnSendMsgAuto.Name = "btnSendMsgAuto";
-            this.btnSendMsgAuto.Size = new System.Drawing.Size(194, 43);
-            this.btnSendMsgAuto.TabIndex = 4;
-            this.btnSendMsgAuto.Text = "自动测试发送群消息";
-            this.btnSendMsgAuto.UseVisualStyleBackColor = true;
-            // 
-            // chkStopTest
-            // 
-            this.chkStopTest.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.chkStopTest.AutoSize = true;
-            this.chkStopTest.Checked = true;
-            this.chkStopTest.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkStopTest.Location = new System.Drawing.Point(473, 16);
-            this.chkStopTest.Name = "chkStopTest";
-            this.chkStopTest.Size = new System.Drawing.Size(158, 17);
-            this.chkStopTest.TabIndex = 5;
-            this.chkStopTest.Text = "停止自动测试发送群消息";
-            this.chkStopTest.UseVisualStyleBackColor = true;
-            // 
             // frmDemo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -526,8 +509,8 @@
             this.gbReciveData.ResumeLayout(false);
             this.tlpSendMsg.ResumeLayout(false);
             this.tlpSendMsg.PerformLayout();
-            this.tlpSendMsg2.ResumeLayout(false);
-            this.tlpSendMsg2.PerformLayout();
+            this.tlpUnder2.ResumeLayout(false);
+            this.tlpUnder2.PerformLayout();
             this.tlpTop.ResumeLayout(false);
             this.tlpTop.PerformLayout();
             this.ResumeLayout(false);
@@ -571,9 +554,8 @@
         private System.Windows.Forms.ColumnHeader columnHeader14;
         private System.Windows.Forms.TableLayoutPanel tlpTop;
         private System.Windows.Forms.Label lbError;
-        private System.Windows.Forms.TableLayoutPanel tlpSendMsg2;
+        private System.Windows.Forms.TableLayoutPanel tlpUnder2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btnSendMsgAuto;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtTime;
         private System.Windows.Forms.CheckBox chkStopTest;

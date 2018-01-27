@@ -19,7 +19,7 @@ namespace WX.Hook.UI
 {
     public partial class frmDemo : Form
     {
-        private BackgroundWorker m_BackgroundWorker;
+        private BackgroundWorker m_BackgroundWorker = new BackgroundWorker();
 
         public frmDemo()
         {
@@ -33,7 +33,12 @@ namespace WX.Hook.UI
             this.lsvGroupList.ItemChecked += LsvGroupList_ItemChecked;
             this.lsvGroupMember.ItemChecked += LsvGroupMember_ItemChecked;
             this.btnSendMsg.Click += BtnSendMsg_Click;
-            this.btnSendMsgAuto.Click += BtnSendMsgAuto_Click;
+            this.chkStopTest.Click += ChkStopTest_Click;
+
+            //m_BackgroundWorker = new BackgroundWorker();
+            m_BackgroundWorker.WorkerSupportsCancellation = true;
+            m_BackgroundWorker.DoWork += M_BackgroundWorker_DoWork;
+            m_BackgroundWorker.RunWorkerCompleted += M_BackgroundWorker_RunWorkerCompleted;
         }
 
         #region Control Event
@@ -206,35 +211,18 @@ namespace WX.Hook.UI
                 MessageBox.Show(ex.Message);
             }
         }
-
-        private void BtnSendMsgAuto_Click(object sender, EventArgs e)
+        
+        private void ChkStopTest_Click(object sender, EventArgs e)
         {
-            /*
-            chkStopTest.Checked = false;
-            int delayTime = CommonUtil.GetObjTranNull<int>(txtTime.Text.Trim());
-            string message = "自动测试：同事聊天，说到家长里短，一人问一男老师，你家生气不？这位摸着脑袋，想了半天，才慢条斯理地说：“都挺忙的，生气？哪有时间啊”。他的话，把所有人都说乐了。";
-
-            
-            
-            while (!chkStopTest.Checked)
+            if (chkStopTest.Checked)
             {
-                try
-                {
-                    if (WeChatEngine.Instance.SelectedMemberOfGroup != null)
-                    {
-                        WeChatEngine.Instance.SendGroupMessageEx(delayTime, message);
-                    }
-                    else if (WeChatEngine.Instance.SelectedGroup != null)
-                    {
-                        WeChatEngine.Instance.SendGroupMessage(delayTime, message);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when auto-send message: ", ex);
-                }
+                LogHelper.WXLogger.WXHOOKUI.InfoFormat("");
+                m_BackgroundWorker.RunWorkerAsync(this);
             }
-            */
+            else
+            {
+                m_BackgroundWorker.CancelAsync();
+            }
         }
 
         private void Form2_FormClosing(object sender, FormClosingEventArgs e)
@@ -243,6 +231,79 @@ namespace WX.Hook.UI
             WeChatEngine.Instance.CloseWeChat();
             Environment.Exit(0);
         }
+        #endregion
+
+        #region Auto test by using async
+        private void M_BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker bw = sender as BackgroundWorker;
+            int delaySecond = CommonUtil.GetObjTranNull<int>(txtTime.Text.Trim());
+            int delayTime = delaySecond * 1000;
+            string[] msgList = {
+                "打个招呼表示我来过",
+                "大家最新好吗？",
+                "大家最新复习得怎样呢？",
+                "要考试了，好紧张",
+                "给大家分享一份成考心得",
+                "My English is so bad",
+                "I can speak a little English",
+                "你们在忙什么呢？",
+                "再过几天我要出去旅游了",
+                "我会给大家带礼物的",
+                "期待放假的生活，哈哈"
+            };
+
+            while (true)
+            {
+                if (bw.CancellationPending)
+                {
+                    e.Cancel = true;
+                    break;
+                }
+                
+                try
+                {
+                    LogHelper.WXLogger.WXHOOKUI.InfoFormat("Running auto test by using asnyc..., delay time: [{0}]", delayTime);
+
+                    Random rd1 = new Random();
+                    int r = rd1.Next(1, msgList.Length);
+                    if (r >= msgList.Length) continue;
+                    string message = msgList[r];
+
+                    if (WeChatEngine.Instance.SelectedMemberOfGroup != null)
+                    {
+                        WeChatEngine.Instance.SendGroupMessageEx(0, message);
+                    }
+                    else if (WeChatEngine.Instance.SelectedGroup != null)
+                    {
+                        WeChatEngine.Instance.SendGroupMessage(0, message);
+                    }
+                    Thread.Sleep(delayTime);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when auto-send message: ", ex);
+                }
+            }
+        }
+
+        private void M_BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                LogHelper.WXLogger.WXHOOKUI.Error("Error occurred when auto test by using asnyc: ", e.Error);
+            }
+            else if (e.Cancelled)
+            {
+                LogHelper.WXLogger.WXHOOKUI.Info("Auto test by using asnyc cancelled.");
+            }
+            else
+            {
+                LogHelper.WXLogger.WXHOOKUI.Info("Auto test by using asnyc completed.");
+            }
+
+        }
+
         #endregion
 
         #region private method
